@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\schlansk\\Downloads\\7-3forest-main",
+        "C:\\Users\\schlansk\\Documents"
+      ]
+    },
+    "forest": {
+      "command": "C:\\Users\\schlansk\\local-node\\node-v20.14.0-win-x64\\node.exe",
+      "args": [
+        "C:\\Users\\schlansk\\Downloads\\7-3forest-main\\7-3forest-main\\___stage1\\forest-mcp-server.js"
+      ],
+      "env": {
+        "FOREST_DATA_DIR": "C:\\Users\\schlansk\\Downloads\\7-3forest-main\\.forest-data"
+      }
+    },
+    "context7": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@upstash/context7-mcp@latest"],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+} 

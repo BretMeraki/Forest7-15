@@ -1,0 +1,33 @@
+# Node.js dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+*.html
+*.css
+
+# OS files
+.DS_Store
+
+# Build output
+dist/
+build/
+
+# Cache directories
+.embedding-cache/
+.forest-vectors/
+.nyc_output/
+.serena/
+chroma-data/
+chroma-env/
+___stage1/
+
+# Misc
+.env
+*.local

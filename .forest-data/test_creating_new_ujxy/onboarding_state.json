@@ -1,0 +1,14 @@
+{
+  "project_id": "test_creating_new_ujxy",
+  "goal": "Test creating a new project to verify functionality",
+  "user_context": {},
+  "current_stage": "context_gathering",
+  "started_at": "2025-07-09T19:03:37.099Z",
+  "gates_completed": [
+    "goal_collection"
+  ],
+  "aggregate_context": {
+    "goal": "Test creating a new project to verify functionality",
+    "context": ""
+  }
+}

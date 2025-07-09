@@ -1,0 +1,1550 @@
+{
+  "test_sqlite_vector_epxt": [
+    {
+      "timestamp": "2025-07-09T02:03:43.832Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:03:43.831Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_sqlite_vector_epxt",
+        "context_from_memory": "Testing SQLite vector store after switching from ChromaDB",
+        "energy_level": 4,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T02:04:05.752Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:04:05.752Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_sqlite_vector_epxt",
+        "context_from_memory": "Verified basic system functionality, now need to test vector-based task recommendations and SQLite backend",
+        "energy_level": 4,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T19:04:27.361Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T19:04:27.361Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_sqlite_vector_epxt",
+        "context_from_memory": "",
+        "energy_level": 3,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T19:05:26.845Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T19:05:26.845Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_sqlite_vector_epxt",
+        "context_from_memory": "Testing vector store functionality with memory context",
+        "energy_level": 4,
+        "time_available": "45 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T19:05:42.657Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T19:05:42.656Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_sqlite_vector_epxt",
+        "context_from_memory": "",
+        "energy_level": 3,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ],
+  "learn_sqlite_database_xmmi": [
+    {
+      "timestamp": "2025-07-09T02:18:27.643Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:18:27.642Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "moderate",
+              "signals": 2,
+              "reasoning": "2/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "learn_sqlite_database_xmmi",
+        "context_from_memory": "Testing vector storage during task completion",
+        "energy_level": 4,
+        "time_available": "20 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ],
+  "test_local_embedding_1146": [
+    {
+      "timestamp": "2025-07-09T02:21:07.086Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:21:07.086Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_local_embedding_1146",
+        "context_from_memory": "Testing local deterministic embeddings for vector-based task selection",
+        "energy_level": 4,
+        "time_available": "25 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ],
+  "test_dynamic_vector_bp7f": [
+    {
+      "timestamp": "2025-07-09T02:57:20.144Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:57:20.143Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_dynamic_vector_bp7f",
+        "context_from_memory": "Testing dynamic vector dimension configuration with multiple provider support",
+        "energy_level": 4,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T02:58:52.927Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:58:52.927Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "moderate",
+              "signals": 2,
+              "reasoning": "2/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_dynamic_vector_bp7f",
+        "context_from_memory": "Testing SQLite vector performance with dynamic dimensions",
+        "energy_level": 5,
+        "time_available": "15 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ],
+  "test_all_forest_ejgd": [
+    {
+      "timestamp": "2025-07-09T02:59:43.516Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T02:59:43.516Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "moderate",
+              "signals": 2,
+              "reasoning": "2/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_all_forest_ejgd",
+        "context_from_memory": "Testing vector-based task selection with SQLite backend",
+        "energy_level": 4,
+        "time_available": "20 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    },
+    {
+      "timestamp": "2025-07-09T19:02:32.023Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T19:02:32.021Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "test_all_forest_ejgd",
+        "context_from_memory": "",
+        "energy_level": 3,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ],
+  "learn_python_web_usyt": [
+    {
+      "timestamp": "2025-07-09T19:03:52.933Z",
+      "context_snapshot": {
+        "timestamp": "2025-07-09T19:03:52.933Z",
+        "momentum": {
+          "velocity": {
+            "current_rate": "unknown",
+            "trend": "insufficient_data",
+            "acceleration": "unknown",
+            "evidence": "Need more progress data points"
+          },
+          "consistency": {
+            "pattern": "unknown",
+            "streak": 0,
+            "reliability_score": 0,
+            "evidence": "No progress data available"
+          },
+          "compound_growth": {
+            "building_on_previous": "unknown",
+            "skill_stacking": "unknown",
+            "momentum_breaks": []
+          }
+        },
+        "readiness": {
+          "immediate_potential": {
+            "can_advance_goal": {
+              "potential": "high",
+              "signals": 3,
+              "reasoning": "3/4 advancement signals present",
+              "can_make_progress": true
+            },
+            "optimal_task_type": "steady_progress",
+            "breakthrough_readiness": false
+          },
+          "capacity": {
+            "focus_for_goal_work": "moderate",
+            "persistence_potential": "moderate",
+            "creative_problem_solving": "moderate"
+          },
+          "blockers": {
+            "immediate_obstacles": [],
+            "energy_misalignment": "aligned",
+            "goal_clarity_issues": []
+          }
+        },
+        "alignment": {
+          "alignment_score": 0.5,
+          "alignment_quality": "medium",
+          "goal_advancement_potential": "medium",
+          "optimal_focus_area": "foundational skills",
+          "goal_connection_strategy": "focus on building core capabilities",
+          "momentum_opportunity": "consistent small progress",
+          "dream_fulfillment_step": "steady advancement"
+        },
+        "breakthrough": {
+          "breakthrough_window": {
+            "conditions_aligned": false,
+            "learning_edge_proximity": "unknown",
+            "confidence_trajectory": "stable"
+          },
+          "breakthrough_type": {}
+        },
+        "fulfillment": {
+          "proximity_to_dream": {
+            "progress_percentage": 0.2,
+            "missing_capabilities": [],
+            "next_milestone": "Next milestone unknown"
+          },
+          "path_optimization": {
+            "current_path_effectiveness": "unknown",
+            "suggested_pivots": [],
+            "acceleration_opportunities": "unknown"
+          },
+          "fulfillment_momentum": {
+            "trajectory": "positive",
+            "emotional_alignment": "aligned",
+            "intrinsic_motivation": "strong"
+          }
+        },
+        "recommendations": {
+          "immediate_action": {
+            "optimal_task_type": {
+              "type": "steady_progress",
+              "reasoning": "Build consistent progress toward goal",
+              "characteristics": [
+                "achievable",
+                "goal_connected",
+                "momentum_maintaining"
+              ]
+            },
+            "duration": {
+              "duration_minutes": 45,
+              "reasoning": "Good advancement potential - substantial goal work",
+              "structure": "focused_goal_session"
+            },
+            "intensity": {
+              "intensity": "moderate",
+              "reasoning": "Sustainable intensity for consistent goal progress",
+              "approach": "steady_advancement"
+            },
+            "approach": {
+              "approach": "foundational skills",
+              "reasoning": "Focus on foundational skills to maximize goal advancement",
+              "connection_strategy": "focus on building core capabilities",
+              "momentum_strategy": "establish_rhythm"
+            }
+          },
+          "session_design": {
+            "goal_connection": "explicit_goal_connection",
+            "momentum_building": "build_on_recent_progress",
+            "breakthrough_setup": "prepare_for_advancement"
+          },
+          "pattern_cultivation": {
+            "consistency_building": "daily_goal_focused_work",
+            "skill_stacking": "connect_new_to_existing_skills",
+            "dream_alignment": "strengthen_goal_vision_connection"
+          }
+        }
+      },
+      "user_args": {
+        "project_id": "learn_python_web_usyt",
+        "context_from_memory": "",
+        "energy_level": 3,
+        "time_available": "30 minutes"
+      },
+      "goal_advancement_score": 0.8,
+      "goal_focused": true
+    }
+  ]
+}

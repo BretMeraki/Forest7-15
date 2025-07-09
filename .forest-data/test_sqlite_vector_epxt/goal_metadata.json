@@ -1,0 +1,8 @@
+{
+  "id": "test_sqlite_vector_epxt",
+  "goal": "Test SQLite vector store functionality",
+  "complexity": "low",
+  "created_at": "2025-07-09T02:03:32.187Z",
+  "vectorized": true,
+  "last_vectorized": "2025-07-09T02:03:37.299Z"
+}

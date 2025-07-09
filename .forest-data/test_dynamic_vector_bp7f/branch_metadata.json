@@ -1,0 +1,29 @@
+{
+  "branches": [
+    {
+      "name": "Dimensions Foundations",
+      "priority": 1,
+      "task_count": 0,
+      "vectorized": true
+    },
+    {
+      "name": "Dimensions Application",
+      "priority": 2,
+      "task_count": 0,
+      "vectorized": true
+    },
+    {
+      "name": "Dimensions Mastery",
+      "priority": 3,
+      "task_count": 0,
+      "vectorized": true
+    },
+    {
+      "name": "Dimensions Innovation",
+      "priority": 4,
+      "task_count": 0,
+      "vectorized": true
+    }
+  ],
+  "last_vectorized": "2025-07-09T02:57:15.334Z"
+}

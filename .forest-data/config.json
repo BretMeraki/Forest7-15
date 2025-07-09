@@ -1,0 +1,47 @@
+{
+  "projects": [
+    {
+      "id": "test_sqlite_vector_epxt",
+      "goal": "Test SQLite vector store functionality",
+      "created_at": "2025-07-09T02:03:32.187Z",
+      "last_accessed": "2025-07-09T19:04:25.203Z"
+    },
+    {
+      "id": "learn_sqlite_database_xmmi",
+      "goal": "Learn SQLite database fundamentals",
+      "created_at": "2025-07-09T02:18:14.346Z",
+      "last_accessed": "2025-07-09T02:18:14.355Z"
+    },
+    {
+      "id": "test_local_embedding_1146",
+      "goal": "Test local embedding generation",
+      "created_at": "2025-07-09T02:20:53.095Z",
+      "last_accessed": "2025-07-09T02:20:53.104Z"
+    },
+    {
+      "id": "test_dynamic_vector_bp7f",
+      "goal": "Test dynamic vector dimensions",
+      "created_at": "2025-07-09T02:57:10.491Z",
+      "last_accessed": "2025-07-09T03:00:00.630Z"
+    },
+    {
+      "id": "test_all_forest_ejgd",
+      "goal": "Test all Forest tool functionality",
+      "created_at": "2025-07-09T02:59:23.006Z",
+      "last_accessed": "2025-07-09T19:02:29.827Z"
+    },
+    {
+      "id": "test_creating_new_ujxy",
+      "goal": "Test creating a new project to verify functionality",
+      "created_at": "2025-07-09T19:03:37.079Z",
+      "last_accessed": "2025-07-09T19:03:37.086Z"
+    },
+    {
+      "id": "learn_python_web_usyt",
+      "goal": "Learn Python web scraping",
+      "created_at": "2025-07-09T19:03:48.773Z",
+      "last_accessed": "2025-07-09T19:03:48.779Z"
+    }
+  ],
+  "activeProject": "test_sqlite_vector_epxt"
+}
