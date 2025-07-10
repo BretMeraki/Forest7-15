@@ -620,7 +620,7 @@ export class EnhancedHTACore extends HTACore {
       }
       
       // Generate 2-4 initial tasks per branch using schema intelligence
-      const taskCount = Math.min(4, Math.max(2, Math.floor(complexityAnalysis.score / 2)));
+      const taskCount = Math.min(25, Math.max(15, complexityAnalysis.score * 3));
       
       for (let i = 0; i < taskCount; i++) {
         const task = {

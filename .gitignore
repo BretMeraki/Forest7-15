@@ -24,10 +24,12 @@ build/
 .forest-vectors/
 .nyc_output/
 .serena/
-chroma-data/
-chroma-env/
-___stage1/
 
 # Misc
 .env
 *.local
+
+# API Keys and sensitive data
+*.key
+*api-key*
+*-credentials.json

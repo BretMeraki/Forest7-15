@@ -25,7 +25,6 @@ import { GatedOnboardingHandlers } from './modules/gated-onboarding-handlers.js'
 import { VectorizedHandlers } from './modules/vectorized-handlers.js';
 import { DiagnosticHandlers } from './modules/diagnostic-handlers.js';
 import { ForestDataVectorization } from './modules/forest-data-vectorization.js';
-import { ChromaDBLifecycleManager } from './modules/ChromaDBLifecycleManager.js';
 import { ClaudeDiagnosticHelper } from './utils/claude-diagnostic-helper.js';
 import path from 'path';
 
@@ -73,7 +72,7 @@ class Stage1CoreServer {
     this.taskStrategyCore = new TaskStrategyCore(
       this.dataPersistence,
       this.projectManagement,
-      null,
+      this.coreIntelligence,  // Pass coreIntelligence for MCP bridge access
       null,
       this.ambiguousDesiresManager
     );
