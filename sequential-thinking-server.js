@@ -1,6 +1,11 @@
 // Official entry point for Sequential Thinking MCP Server
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const serverPath = path.join(__dirname, 'servers', 'sequentialthinking', 'dist', 'index.js');
 
@@ -18,4 +23,4 @@ child.on('exit', (code) => {
   if (code !== 0) {
     console.error(`Sequential Thinking MCP Server exited with code ${code}`);
   }
-}); 
+});

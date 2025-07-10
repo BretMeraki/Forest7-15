@@ -8,7 +8,7 @@
       "priority": "high"
     }
   ],
-  "context": "Testing if our SQLite vector integration is working correctly after the switch from ChromaDB",
+  "context": "Testing if our SQLite vector integration is working correctly",
   "constraints": {},
   "existing_credentials": [],
   "current_habits": {},

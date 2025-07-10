@@ -140,8 +140,8 @@ async function runHealthCheck() {
   results.checks.push(await checkFile('.forest-data/forest-mcp.log', 'MCP Log'));
   results.checks.push(await checkFile('.forest-data/projects.json', 'Projects Data'));
   
-  // Check ChromaDB if configured
-  results.checks.push(await checkPort(8000, 'ChromaDB'));
+  // Check vector store connectivity
+  // Note: SQLite vector store doesn't require external port checks
   
   // Check memory
   await checkMemory();

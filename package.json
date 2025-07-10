@@ -19,9 +19,8 @@
   "dependencies": {
     "@babel/parser": "^7.26.2",
     "@babel/traverse": "^7.26.2",
-    "@chroma-core/default-embed": "^0.1.8",
     "@modelcontextprotocol/sdk": "^1.13.3",
-    "chromadb": "^3.0.6",
+    "@modelcontextprotocol/server-filesystem": "^2025.7.1",
     "node-fetch": "^3.3.2",
     "sqlite3": "^5.1.6",
     "ws": "^8.18.3"
