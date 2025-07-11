@@ -68,31 +68,12 @@ export class VectorizedHandlers {
           console.error('[VectorizedTask] ✅ MCP Intelligence Bridge request successful');
           console.error(`[VectorizedTask] 📝 Request ID: ${intelligenceRequest.requestId}`);
           
-          // For now, return a placeholder that shows the bridge is working
-          // In a full implementation, this would wait for Claude's response and process it
-          return {
-            content: [{
-              type: 'text',
-              text: `🧠 **Intelligent Task Generated via MCP Bridge** ✨\n\n` +
-                    `**Task**: Contextual Learning Task\n` +
-                    `**Description**: This task was generated using the new MCP Intelligence Bridge, which sent a sophisticated prompt to Claude for intelligent task generation.\n\n` +
-                    `**Context Considered**:\n` +
-                    `• Project Goal: ${activeProject.goal}\n` +
-                    `• Energy Level: ${energyLevel}/5\n` +
-                    `• Time Available: ${timeAvailable}\n` +
-                    `• Context: ${contextFromMemory || 'None provided'}\n\n` +
-                    `**MCP Bridge Status**: ✅ Active\n` +
-                    `**Request ID**: ${intelligenceRequest.requestId}\n\n` +
-                    `*This demonstrates that your MCP Intelligence Bridge is working correctly and generating sophisticated prompts for Claude to process.*`
-            }],
-            task_info: {
-              task_id: 'mcp_bridge_task_' + Date.now(),
-              request_id: intelligenceRequest.requestId,
-              bridge_active: true,
-              intelligence_used: true,
-              mcp_bridge: true
-            }
-          };
+// In a real implementation, this would wait for Claude's response via MCP protocol
+          // For now, we'll simulate the response handling and fall back to HTA tasks
+          console.error('[VectorizedTask] 🔄 MCP Bridge request sent, falling back to HTA task selection for now');
+          
+          // Fall through to HTA/traditional task selection immediately
+          // This ensures users get actual tasks instead of placeholder messages
         }
         
       } catch (intelligenceError) {
@@ -101,13 +82,29 @@ export class VectorizedHandlers {
         // Fall through to vector/traditional fallbacks
       }
       
-      // Fallback to traditional task selection
-      console.error('[VectorizedTask] 🔄 Falling back to traditional task selection...');
-      const traditionalResult = await this.taskStrategyCore.getNextTask(args);
+      // Fallback to traditional task selection using HTA
+      console.error('[VectorizedTask] 🔄 Falling back to HTA-based task selection...');
+      const traditionalResult = await this.taskStrategyCore.getNextTask({
+        ...args,
+        context_from_memory: contextFromMemory,
+        energy_level: energyLevel,
+        time_available: timeAvailable
+      });
       
-      // Enhance traditional result with note about MCP bridge attempt
+      // Enhance traditional result with context about energy and time
       if (traditionalResult && traditionalResult.content && traditionalResult.content[0]) {
-        traditionalResult.content[0].text += '\n\n*Note: MCP Intelligence Bridge attempted but fell back to traditional selection*';
+        // Remove any old placeholder notes and add useful context
+        traditionalResult.content[0].text = traditionalResult.content[0].text.replace(
+          /\n\n\*Note: MCP Intelligence Bridge attempted but fell back to traditional selection\*/g, 
+          ''
+        );
+        
+        // Add context about the selection process
+        traditionalResult.content[0].text += `\n\n**Selection Context**:\n` +
+          `• Energy Level: ${energyLevel}/5\n` +
+          `• Time Available: ${timeAvailable}\n` +
+          `• Task Source: HTA Strategic Framework\n` +
+          `• Goal: ${activeProject.goal}`;
       }
       
       return traditionalResult;

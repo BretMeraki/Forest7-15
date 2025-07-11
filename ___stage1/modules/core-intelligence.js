@@ -352,6 +352,41 @@ class ForestIntelligenceAdapter {
         return await this.core.request(processRequest);
     }
 
+    // Direct response processing for vectorized handlers
+    async processIntelligenceResponseDirect(requestId, claudeResponseParams) {
+        const requestContext = this.core.pendingRequests.get(requestId);
+        if (!requestContext) {
+            throw new Error(`No pending request found for ID: ${requestId}`);
+        }
+
+        this.core.pendingRequests.delete(requestId);
+
+        try {
+            const processedResponse = await this.core.validateAndStructureResponse(
+                claudeResponseParams.response || claudeResponseParams, 
+                requestContext.expectedSchema
+            );
+
+            return {
+                type: 'INTELLIGENCE_RESPONSE',
+                requestId: requestId,
+                data: processedResponse,
+                metadata: {
+                    processedAt: Date.now(),
+                    processingTime: Date.now() - requestContext.timestamp,
+                    schema: requestContext.expectedSchema ? 'validated' : 'none'
+                }
+            };
+        } catch (error) {
+            return {
+                type: 'INTELLIGENCE_ERROR',
+                requestId: requestId,
+                error: error.message,
+                originalResponse: claudeResponseParams.response || claudeResponseParams
+            };
+        }
+    }
+
     // Legacy compatibility method for existing Forest modules
     async requestIntelligence(prompt, options = {}) {
         const system = options.system || "You are an intelligent assistant providing analysis and insights.";
