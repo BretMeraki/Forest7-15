@@ -109,9 +109,30 @@ export class ClarificationDialogue {
     const userResponse = args.response || '';
 
     try {
-      const session = this.activeDialogues.get(dialogueId);
-      if (!session || session.status !== 'active') {
-        throw new Error('No active clarification dialogue found with that ID');
+      // First check in-memory active dialogues
+      let session = this.activeDialogues.get(dialogueId);
+      
+      // If not found in memory, try loading from persistent storage
+      if (!session) {
+        // Try to get the project ID from the current active project
+        const activeProject = await this.projectManagement.getActiveProject();
+        const projectId = activeProject ? activeProject.project_id : null;
+        
+        if (projectId) {
+          session = await this.loadDialogueSession(projectId, dialogueId);
+          if (session) {
+            // Restore session to active dialogues
+            this.activeDialogues.set(dialogueId, session);
+          }
+        }
+      }
+      
+      if (!session) {
+        throw new Error(`No clarification dialogue found with ID: ${dialogueId}. The dialogue may have expired or been completed. Please start a new dialogue with 'start_clarification_dialogue_forest'.`);
+      }
+      
+      if (session.status !== 'active') {
+        throw new Error(`Dialogue ${dialogueId} is not active (status: ${session.status}). Please start a new dialogue with 'start_clarification_dialogue_forest'.`);
       }
 
       // Record user response
@@ -723,6 +744,9 @@ export class ClarificationDialogue {
         `clarification_dialogue_${session.id}.json`,
         sessionData
       );
+
+      // Update vector store with dialogue content
+      await this.updateVectorStoreWithDialogue(projectId, session);
     } catch (error) {
       console.error('Failed to save clarification dialogue session:', error.message);
     }
@@ -754,5 +778,187 @@ export class ClarificationDialogue {
   getActiveDialogues(projectId) {
     return Array.from(this.activeDialogues.values())
       .filter(session => session.projectId === projectId && session.status === 'active');
+  }
+
+  /**
+   * Resume all active dialogues from persistent storage on server restart
+   */
+  async resumeActiveDialogues(projectId) {
+    try {
+      const projectFiles = await this.dataPersistence.listProjectFiles(projectId);
+      const dialogueFiles = projectFiles.filter(file => file.startsWith('clarification_dialogue_'));
+      
+      for (const file of dialogueFiles) {
+        try {
+          const sessionData = await this.dataPersistence.loadProjectData(projectId, file);
+          if (sessionData && sessionData.status === 'active') {
+            // Restore active dialogues to memory
+            this.activeDialogues.set(sessionData.id, sessionData);
+            console.log(`Resumed dialogue session: ${sessionData.id}`);
+          }
+        } catch (error) {
+          console.error(`Failed to resume dialogue session from ${file}:`, error.message);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to resume active dialogues:', error.message);
+    }
+  }
+
+  /**
+   * List all active dialogue sessions for debugging
+   */
+  listActiveDialogues() {
+    const activeSessions = Array.from(this.activeDialogues.values())
+      .map(session => ({
+        id: session.id,
+        projectId: session.projectId,
+        status: session.status,
+        round: session.currentRound,
+        startedAt: session.startedAt,
+        originalGoal: session.originalGoal
+      }));
+    
+    console.log('Active dialogue sessions:', activeSessions);
+    return activeSessions;
+  }
+
+  /**
+   * Update vector store with dialogue content
+   */
+  async updateVectorStoreWithDialogue(projectId, session) {
+    try {
+      if (!this.vectorStore) {
+        console.log('Vector store not available, skipping dialogue vectorization');
+        return;
+      }
+
+      // Generate vector content for each response
+      for (const response of session.responses) {
+        const vectorContent = this.generateDialogueVectorContent(session, response);
+        
+        // Add to vector store with dialogue-specific metadata
+        await this.vectorStore.addVector({
+          projectId: projectId,
+          content: vectorContent.text,
+          metadata: {
+            type: 'clarification_dialogue',
+            dialogueId: session.id,
+            round: response.round,
+            timestamp: response.timestamp,
+            themes: response.themes,
+            confidence: response.confidence,
+            originalGoal: session.originalGoal,
+            status: session.status,
+            ...vectorContent.metadata
+          }
+        });
+      }
+
+      // If dialogue is completed, add final refined goal
+      if (session.status === 'completed' && session.refinedGoal) {
+        const refinedGoalContent = this.generateRefinedGoalVectorContent(session);
+        
+        await this.vectorStore.addVector({
+          projectId: projectId,
+          content: refinedGoalContent.text,
+          metadata: {
+            type: 'refined_goal',
+            dialogueId: session.id,
+            timestamp: session.completedAt,
+            confidence: session.finalConfidence,
+            originalGoal: session.originalGoal,
+            refinedGoal: session.refinedGoal.text,
+            themes: session.refinedGoal.themes,
+            responseCount: session.responses.length,
+            ...refinedGoalContent.metadata
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update vector store with dialogue:', error.message);
+    }
+  }
+
+  /**
+   * Generate vector content from dialogue response
+   */
+  generateDialogueVectorContent(session, response) {
+    const questionText = response.question || session.lastQuestion || '';
+    const responseText = response.response || '';
+    const themes = response.themes || [];
+    
+    // Create comprehensive text for vectorization
+    const text = [
+      `Clarification Dialogue Round ${response.round}`,
+      `Original Goal: ${session.originalGoal}`,
+      `Question: ${questionText}`,
+      `User Response: ${responseText}`,
+      `Identified Themes: ${themes.join(', ')}`,
+      `Confidence Level: ${Math.round(response.confidence * 100)}%`
+    ].join('\n');
+
+    return {
+      text,
+      metadata: {
+        questionText,
+        responseText,
+        dialogueRound: response.round,
+        identifiedThemes: themes,
+        confidenceLevel: response.confidence
+      }
+    };
+  }
+
+  /**
+   * Generate vector content from refined goal
+   */
+  generateRefinedGoalVectorContent(session) {
+    const refinedGoal = session.refinedGoal;
+    const evolutionSummary = this.createEvolutionSummary(session, refinedGoal);
+    
+    // Create comprehensive text for vectorization
+    const text = [
+      `Goal Clarification Complete`,
+      `Original Goal: ${session.originalGoal}`,
+      `Refined Goal: ${refinedGoal.text}`,
+      `Key Themes: ${refinedGoal.themes.join(', ')}`,
+      `Evolution Summary: ${evolutionSummary}`,
+      `Final Confidence: ${Math.round(session.finalConfidence * 100)}%`,
+      `Dialogue Duration: ${session.responses.length} rounds`
+    ].join('\n');
+
+    return {
+      text,
+      metadata: {
+        goalEvolution: evolutionSummary,
+        finalThemes: refinedGoal.themes,
+        dialogueDuration: session.responses.length,
+        goalTransformation: {
+          from: session.originalGoal,
+          to: refinedGoal.text
+        }
+      }
+    };
+  }
+
+  /**
+   * Create evolution summary from dialogue session
+   */
+  createEvolutionSummary(session, refinedGoal) {
+    const keyInsights = session.responses
+      .filter(response => response.themes && response.themes.length > 0)
+      .map(response => response.themes.join(', '))
+      .join('; ');
+
+    const confidenceProgression = session.responses
+      .map(response => `Round ${response.round}: ${Math.round(response.confidence * 100)}%`)
+      .join(', ');
+
+    return [
+      `Key insights emerged: ${keyInsights}`,
+      `Confidence progression: ${confidenceProgression}`,
+      `Final transformation: ${session.originalGoal} → ${refinedGoal.text}`
+    ].join('. ');
   }
 }

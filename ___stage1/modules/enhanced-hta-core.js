@@ -625,8 +625,8 @@ export class EnhancedHTACore extends HTACore {
       for (let i = 0; i < taskCount; i++) {
         const task = {
           id: `${branchName.toLowerCase().replace(/\s+/g, '_')}_${taskId}`,
-          title: `${this.getProgressiveTaskName(i, taskCount)} ${branchName}`,
-          description: `${branchDescription} - Phase ${i + 1}`,
+          title: `${this.getProgressiveTaskName(i, taskCount)} ${this.getCleanBranchName(branchName)}`,
+          description: `${this.getCleanTaskDescription(branchDescription, i + 1)}`,
           difficulty: Math.min(5, Math.max(1, Math.floor(complexityAnalysis.score / 2) + (i * 0.5))),
           duration: this.calculateContextAwareDuration(complexityAnalysis.score, i, initialContext),
           branch: branchName,
@@ -796,6 +796,52 @@ export class EnhancedHTACore extends HTACore {
     return progressTerms[Math.min(termIndex, progressTerms.length - 1)];
   }
 
+  /**
+   * Clean branch name to prevent goal text redundancy
+   */
+  getCleanBranchName(branchName) {
+    if (!branchName || typeof branchName !== 'string') {
+      return 'Learning Branch';
+    }
+    
+    // Remove common redundant patterns
+    const cleanName = branchName
+      .replace(/^(Build strong foundations in|Apply|Achieve proficiency in|Master|Implement and build using|Master the methodology and process for)\s+/i, '')
+      .replace(/\s+(Build strong foundations in|Apply|Achieve proficiency in|Master|Implement and build using|Master the methodology and process for)\s+/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // If the cleaned name is too short or empty, use the original
+    if (cleanName.length < 3) {
+      return branchName;
+    }
+    
+    return cleanName;
+  }
+
+  /**
+   * Clean task description to prevent goal text redundancy
+   */
+  getCleanTaskDescription(branchDescription, phaseNumber) {
+    if (!branchDescription || typeof branchDescription !== 'string') {
+      return `Learning activity - Phase ${phaseNumber}`;
+    }
+    
+    // Remove common redundant patterns and goal text repetition
+    const cleanDescription = branchDescription
+      .replace(/^(Build strong foundations in|Apply concepts in|Achieve proficiency in|Master advanced concepts in|Implement and build using|Master the methodology and process for)\s+/i, '')
+      .replace(/\s+(Build strong foundations in|Apply concepts in|Achieve proficiency in|Master advanced concepts in|Implement and build using|Master the methodology and process for)\s+/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // If the cleaned description is too short, create a meaningful one
+    if (cleanDescription.length < 5) {
+      return `Learning activity - Phase ${phaseNumber}`;
+    }
+    
+    return `${cleanDescription} - Phase ${phaseNumber}`;
+  }
+
   calculateContextAwareDuration(complexityScore, taskIndex, context) {
     const baseDuration = 25; // minutes
     const complexityMultiplier = 1 + (complexityScore - 3) * 0.2;
@@ -873,11 +919,11 @@ export class EnhancedHTACore extends HTACore {
         failedAttempt: true,
         requireDomainSpecificBranches: true,
         avoidGenericTemplates: true,
-        examples: {
-          AI: ['Mathematical Foundations', 'Neural Network Architecture', 'Model Training & Validation'],
-          cybersecurity: ['Security Fundamentals', 'Threat Analysis', 'Penetration Testing'],
-          photography: ['Camera Fundamentals', 'Composition Techniques', 'Post-Processing Mastery'],
-          programming: ['Language Syntax', 'Problem-Solving Patterns', 'Real-World Applications']
+        retryInstructions: {
+          emphasize: 'Use domain-specific terminology that directly relates to the goal',
+          avoid: 'Generic terms like Foundation, Research, Implementation',
+          focus: 'Create branch names that reflect the actual subject matter and objectives',
+          example_approach: 'If goal is about X, create branches like "X Theory", "X Application", "X Mastery" rather than generic phases'
         }
       };
       
@@ -930,29 +976,29 @@ export class EnhancedHTACore extends HTACore {
     
     // Base branches that work for any goal
     branches.push(
-      { name: `${capitalizedTopic} Foundations`, description: `Build strong foundations in ${goal}`, priority: 1 },
-      { name: `${capitalizedTopic} Application`, description: `Apply ${goal} in practical scenarios`, priority: 2 },
-      { name: `${capitalizedTopic} Mastery`, description: `Achieve proficiency in ${goal}`, priority: 3 }
+  { name: `${capitalizedTopic} Foundations`, description: `Build strong foundations and core understanding`, priority: 1 },
+{ name: `${capitalizedTopic} Application`, description: `Apply concepts in practical scenarios`, priority: 2 },
+      { name: `${capitalizedTopic} Mastery`, description: `Achieve proficiency and expertise`, priority: 3 }
     );
     
     // Add complexity-specific branches
     if (characteristics.complexity === 'high') {
       branches.push(
-        { name: `Advanced ${capitalizedTopic}`, description: `Master advanced concepts in ${goal}`, priority: 4 },
-        { name: `${capitalizedTopic} Innovation`, description: `Innovate and extend ${goal}`, priority: 5 }
+        { name: `Advanced ${capitalizedTopic}`, description: `Master advanced concepts and techniques`, priority: 4 },
+        { name: `${capitalizedTopic} Innovation`, description: `Innovate and extend beyond current practices`, priority: 5 }
       );
     }
     
     // Add characteristic-specific branches
     if (characteristics.characteristics.includes('technical')) {
       branches.push(
-        { name: `${capitalizedTopic} Implementation`, description: `Implement and build using ${goal}`, priority: branches.length + 1 }
+        { name: `${capitalizedTopic} Implementation`, description: `Implement and build practical solutions`, priority: branches.length + 1 }
       );
     }
     
     if (characteristics.characteristics.includes('process-oriented')) {
       branches.push(
-        { name: `${capitalizedTopic} Methodology`, description: `Master the methodology and process for ${goal}`, priority: branches.length + 1 }
+        { name: `${capitalizedTopic} Methodology`, description: `Master the methodology and systematic approach`, priority: branches.length + 1 }
       );
     }
     

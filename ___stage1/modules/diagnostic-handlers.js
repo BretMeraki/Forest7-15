@@ -254,12 +254,13 @@ export class DiagnosticHandlers {
                 `**Timestamp**: ${new Date().toISOString()}\n\n` +
                 `**Cache State**:\n` +
                 `• Total Entries: ${cacheState.totalEntries}\n` +
+                `• Filtered Entries: ${cacheState.filteredEntries}\n` +
                 `• Memory Usage: ${cacheState.memoryUsage}\n` +
                 `• Hit Rate: ${cacheState.hitRate}%\n` +
                 `• Most Recent: ${cacheState.mostRecent || 'None'}\n\n` +
-                `**Cache Contents**:\n` +
+                `**Cache Contents** (showing first 10 entries):\n` +
                 Object.entries(cacheState.contents || {})
-                  .map(([key, value]) => `• ${key}: ${typeof value === 'object' ? JSON.stringify(value).slice(0, 50) + '...' : value}`)
+                  .map(([key, value]) => `• ${key}: ${value}`)
                   .join('\n') +
                 `\n\n**Actions**:\n` +
                 `• Use \`emergency_clear_cache_forest\` to clear cache if needed\n` +

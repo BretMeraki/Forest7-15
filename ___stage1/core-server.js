@@ -99,6 +99,9 @@ class Stage1CoreServer {
     
     // Connect TaskStrategyCore to AmbiguousDesiresManager
     this.ambiguousDesiresManager.taskStrategyCore = this.taskStrategyCore;
+    
+    // Initialize AmbiguousDesiresManager (will be called in initialize method)
+    this.ambiguousDesiresInitialized = false;
 
     // Initialize Forest Data Vectorization FIRST for semantic operations
     this.forestDataVectorization = new ForestDataVectorization(this.dataPersistence.dataDir);
@@ -265,6 +268,17 @@ class Stage1CoreServer {
         }
       }
       
+      // Initialize AmbiguousDesiresManager after all other components
+      if (!this.ambiguousDesiresInitialized) {
+        try {
+          await this.ambiguousDesiresManager.initialize();
+          this.ambiguousDesiresInitialized = true;
+          console.error('✅ AmbiguousDesiresManager initialized');
+        } catch (error) {
+          console.error('⚠️ AmbiguousDesiresManager initialization failed:', error.message);
+        }
+      }
+      
       console.error('✅ Stage1 Core Server initialized successfully');
       this.initialized = true;
       
@@ -394,11 +408,6 @@ class Stage1CoreServer {
               result = await this.handleFactoryReset(args); break;
             case 'get_landing_page_forest':
               result = await this.generateLandingPage(); break;
-            case 'debug_cache_forest':
-              result = await this.debugCacheState(args); break;
-            case 'emergency_clear_cache_forest':
-              result = await this.emergencyClearCache(args); break;
-            
             // Gated Onboarding Flow Tools
             case 'start_learning_journey_forest':
               result = await this.gatedOnboardingHandlers.startLearningJourney(args); break;
@@ -526,6 +535,170 @@ class Stage1CoreServer {
         },
       ],
     };
+  }
+
+  /**
+   * Assess goal complexity for vectorization
+   */
+  assessGoalComplexity(goal, context = '') {
+    if (!goal || typeof goal !== 'string') {
+      return {
+        score: 3,
+        level: 'moderate',
+        factors: ['Goal not properly defined']
+      };
+    }
+
+    const goalLower = goal.toLowerCase();
+    const contextLower = (context || '').toLowerCase();
+    let complexityScore = 1;
+    const factors = [];
+
+    // Technical complexity indicators
+    const technicalTerms = [
+      'implement', 'build', 'develop', 'create', 'design', 'architect',
+      'system', 'framework', 'algorithm', 'model', 'application', 'software',
+      'programming', 'code', 'api', 'database', 'network', 'security'
+    ];
+
+    // Mastery/advanced indicators
+    const masteryTerms = [
+      'master', 'expert', 'advanced', 'professional', 'comprehensive',
+      'deep', 'thorough', 'complete', 'optimization', 'performance'
+    ];
+
+    // Domain-specific complexity
+    const complexDomains = [
+      'machine learning', 'artificial intelligence', 'blockchain', 'quantum',
+      'cybersecurity', 'data science', 'cloud architecture', 'devops'
+    ];
+
+    // Time/scope indicators
+    const scopeIndicators = [
+      'multiple', 'various', 'several', 'complex', 'enterprise', 'large-scale',
+      'production', 'scalable', 'distributed'
+    ];
+
+    // Analyze goal text
+    const fullText = `${goalLower} ${contextLower}`;
+
+    if (technicalTerms.some(term => fullText.includes(term))) {
+      complexityScore += 2;
+      factors.push('Technical implementation required');
+    }
+
+    if (masteryTerms.some(term => fullText.includes(term))) {
+      complexityScore += 3;
+      factors.push('Mastery-level expertise targeted');
+    }
+
+    if (complexDomains.some(domain => fullText.includes(domain))) {
+      complexityScore += 2;
+      factors.push('Complex domain knowledge required');
+    }
+
+    if (scopeIndicators.some(term => fullText.includes(term))) {
+      complexityScore += 1;
+      factors.push('Broad scope or multiple components');
+    }
+
+    // Determine complexity level
+    let level = 'simple';
+    if (complexityScore >= 7) level = 'expert';
+    else if (complexityScore >= 5) level = 'complex';
+    else if (complexityScore >= 3) level = 'moderate';
+
+    return {
+      score: Math.min(10, complexityScore),
+      level,
+      factors: factors.length > 0 ? factors : ['Standard learning objective']
+    };
+  }
+
+  /**
+   * Extract domain from goal for vectorization
+   */
+  extractDomain(goal) {
+    if (!goal || typeof goal !== 'string') {
+      return 'general';
+    }
+
+    const goalLower = goal.toLowerCase();
+
+    // Programming domains
+    const programmingLanguages = [
+      'python', 'javascript', 'java', 'c++', 'c#', 'ruby', 'go', 'rust',
+      'typescript', 'php', 'swift', 'kotlin', 'scala', 'r', 'matlab'
+    ];
+
+    // Technology domains
+    const techDomains = {
+      'web development': ['web', 'html', 'css', 'frontend', 'backend', 'fullstack'],
+      'mobile development': ['mobile', 'android', 'ios', 'react native', 'flutter'],
+      'data science': ['data science', 'analytics', 'statistics', 'visualization'],
+      'machine learning': ['machine learning', 'ml', 'ai', 'artificial intelligence', 'deep learning'],
+      'cybersecurity': ['security', 'cybersecurity', 'penetration testing', 'ethical hacking'],
+      'cloud computing': ['cloud', 'aws', 'azure', 'gcp', 'docker', 'kubernetes'],
+      'database': ['database', 'sql', 'nosql', 'mongodb', 'postgresql', 'mysql'],
+      'networking': ['networking', 'network', 'tcp/ip', 'routing', 'switching'],
+      'devops': ['devops', 'ci/cd', 'automation', 'infrastructure'],
+      'game development': ['game', 'unity', 'unreal', 'gaming'],
+      'blockchain': ['blockchain', 'cryptocurrency', 'ethereum', 'smart contracts']
+    };
+
+    // Creative/design domains
+    const creativeDomains = {
+      'graphic design': ['design', 'photoshop', 'illustrator', 'graphic'],
+      'photography': ['photography', 'photo', 'camera', 'lightroom'],
+      'video editing': ['video', 'editing', 'premiere', 'after effects'],
+      'music production': ['music', 'audio', 'production', 'mixing'],
+      'writing': ['writing', 'content', 'copywriting', 'blog']
+    };
+
+    // Business domains
+    const businessDomains = {
+      'marketing': ['marketing', 'digital marketing', 'seo', 'advertising'],
+      'project management': ['project management', 'agile', 'scrum', 'kanban'],
+      'finance': ['finance', 'accounting', 'investment', 'trading'],
+      'sales': ['sales', 'selling', 'business development']
+    };
+
+    // Check programming languages first
+    for (const lang of programmingLanguages) {
+      if (goalLower.includes(lang)) {
+        return `programming-${lang}`;
+      }
+    }
+
+    // Check all domain categories
+    const allDomains = { ...techDomains, ...creativeDomains, ...businessDomains };
+    
+    for (const [domain, keywords] of Object.entries(allDomains)) {
+      if (keywords.some(keyword => goalLower.includes(keyword))) {
+        return domain;
+      }
+    }
+
+    // Language learning
+    if (goalLower.includes('language') || goalLower.includes('spanish') || 
+        goalLower.includes('french') || goalLower.includes('german') ||
+        goalLower.includes('chinese') || goalLower.includes('japanese')) {
+      return 'language-learning';
+    }
+
+    // Health and fitness
+    if (goalLower.includes('fitness') || goalLower.includes('health') ||
+        goalLower.includes('exercise') || goalLower.includes('nutrition')) {
+      return 'health-fitness';
+    }
+
+    // Academic subjects
+    if (goalLower.includes('math') || goalLower.includes('physics') ||
+        goalLower.includes('chemistry') || goalLower.includes('biology')) {
+      return 'academic-sciences';
+    }
+
+    return 'general';
   }
 
   /**
@@ -917,23 +1090,30 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
       const projects = projectsList.projects || [];
       const activeProjectId = this.projectManagement.getActiveProjectId();
       
-      content += `**Your Projects:**\n`;
+      content += `**Your Active Projects:**\n\n`;
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
         const isActive = project.id === activeProjectId;
         const activeMarker = isActive ? ' ✅ **(CURRENTLY ACTIVE)**' : '';
         const lastActivity = project.last_accessed ? ` - Last activity: ${new Date(project.last_accessed).toLocaleDateString()}` : ' - No recent activity';
-        content += `\n**${i + 1}. ${project.id}**${activeMarker}\n`;
-        if (project.goal) {
-          content += `   📝 *${project.goal}*\n`;
-        }
-        content += `   📅 ${lastActivity}\n`;
+        
+        // Show both project ID and name if available, or goal as fallback name
+        const projectName = project.name || project.project_name || project.id;
+        const projectGoal = project.goal || 'No goal specified';
+        
+        content += `### ${i + 1}. ${projectName}${activeMarker}\n`;
+        content += `   **ID**: \`${project.id}\`\n`;
+        content += `   **Goal**: ${projectGoal}\n`;
+        content += `   **Status**: ${lastActivity}\n`;
+        content += `   **Switch to**: \`switch_project_forest {"project_id": "${project.id}"}\`\n\n`;
       }
       
-      content += `\n**Continue your journey:**\n`;
-      content += `• \`switch_project_forest\` + project name - Activate a specific project\n`;
+      content += `**Quick Actions:**\n`;
       content += `• \`current_status_forest\` - Check your current progress\n`;
-      content += `• \`get_next_task_forest\` - Get next task for active project\n\n`;
+      content += `• \`get_next_task_forest\` - Get next task for active project\n`;
+      content += `• \`list_projects_forest\` - See all projects in detail\n\n`;
+      content += `**To switch projects, use the exact project ID shown above.**\n`;
+      content += `Example: \`switch_project_forest {"project_id": "your_exact_project_id"}\`\n\n`;
     } else {
       content += `No existing projects yet - but that's about to change! Your first project will be the foundation for achieving something extraordinary.\n\n`;
       content += `**Once you have projects:** Use \`list_projects_forest\` and \`switch_project_forest\`\n\n`;

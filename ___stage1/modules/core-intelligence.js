@@ -28,24 +28,39 @@ class MCPIntelligenceCore {
     }
 
     async delegateToClaudeIntelligence(params) {
+        console.error('🌉 MCP Bridge: delegateToClaudeIntelligence called with params:');
+        console.error('  - params:', JSON.stringify(params, null, 2));
+        console.error('  - params.goal:', params.goal);
+        console.error('  - params.user_goal:', params.user_goal);
+        console.error('  - params.learning_goal:', params.learning_goal);
+        console.error('  - params.system:', params.system);
+        console.error('  - params.user:', params.user);
+        console.error('  - params.prompt:', params.prompt);
+        
         const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         this.pendingRequests.set(requestId, {
             originalParams: params,
             timestamp: Date.now(),
             expectedSchema: params.schema
         });
+        
+        console.error('🧠 **Intelligent Task Generated via MCP Bridge** ✨');
+        console.error('Project Goal:', params.goal || params.user_goal || params.learning_goal || 'undefined');
+        console.error('Request ID:', requestId);
 
         return {
             type: 'CLAUDE_INTELLIGENCE_REQUEST',
             requestId: requestId,
             prompt: {
                 system: params.system,
-                user: params.user,
-                schema: params.schema ? JSON.stringify(params.schema, null, 2) : null
+                user: params.user || params.prompt,
+                schema: params.schema ? JSON.stringify(params.schema, null, 2) : null,
+                goal: params.goal || params.user_goal || params.learning_goal,
+                context: params.context
             },
             parameters: {
                 maxTokens: params.max_tokens || 500,
-                temperature: params.temperature || 0.7
+                temperature: params.temperature || 0.95
             },
             processingInstructions: this.generateProcessingInstructions(params),
             responseFormat: params.schema ? 'structured_json' : 'text'
@@ -151,7 +166,7 @@ class MCPIntelligenceCore {
                 user: user,
                 schema: options.schema,
                 max_tokens: options.maxTokens || 500,
-                temperature: options.temperature || 0.7,
+                temperature: options.temperature || 0.9,
                 context: options.context
             }
         };
@@ -190,7 +205,7 @@ class ForestIntelligenceAdapter {
         };
 
         const request = MCPIntelligenceCore.createIntelligenceRequest(
-            system, user, { schema, maxTokens: 400, temperature: 0.7 }
+            system, user, { schema, maxTokens: 400, temperature: 0.9 }
         );
 
         return await this.core.request(request);
@@ -265,7 +280,7 @@ class ForestIntelligenceAdapter {
         };
 
         const request = MCPIntelligenceCore.createIntelligenceRequest(
-            system, user, { schema, maxTokens: 2000, temperature: 0.3 }
+            system, user, { schema, maxTokens: 2000, temperature: 0.95 }
         );
 
         return await this.core.request(request);
@@ -323,7 +338,7 @@ class ForestIntelligenceAdapter {
         };
 
         const request = MCPIntelligenceCore.createIntelligenceRequest(
-            system, user, { schema, maxTokens: 1500, temperature: 0.4 }
+            system, user, { schema, maxTokens: 1500, temperature: 0.85 }
         );
 
         return await this.core.request(request);
@@ -344,7 +359,7 @@ class ForestIntelligenceAdapter {
             system, prompt, {
                 schema: options.schema,
                 maxTokens: options.max_tokens || options.maxTokens || 500,
-                temperature: options.temperature || 0.7,
+                temperature: options.temperature || 0.9,
                 context: options.context
             }
         );
@@ -372,7 +387,7 @@ export class CoreIntelligence {
       system, prompt, {
         schema: options.schema,
         maxTokens: options.max_tokens || options.maxTokens || 500,
-        temperature: options.temperature || 0.7,
+        temperature: options.temperature || 0.9,
         context: options.context
       }
     );

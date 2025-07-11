@@ -696,8 +696,13 @@ Response format:
 
       return response.isValid ? response : {
         isValid: false,
-        message: 'Goal needs refinement for optimal learning path generation',
-        suggestions: ['Make the goal more specific', 'Add measurable outcomes', 'Define success criteria']
+        message: 'Your goal is too broad to create a personalized learning journey.',
+        suggestions: [
+          'Please provide a clear and specific goal, such as:',
+          '• "Build a React dashboard with real-time updates"',
+          '• "Master JavaScript async patterns"',
+          '• "Create a 3D portfolio website using Three.js"'
+        ]
       };
 
     } catch (error) {

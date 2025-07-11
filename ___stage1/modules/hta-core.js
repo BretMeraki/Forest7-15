@@ -265,7 +265,7 @@ export class HTACore {
             params: {
               prompt: branchPrompt,
               max_tokens: 4000,
-              temperature: 0.7,
+              temperature: 0.95,
               system: 'You are an expert learning strategist. Generate comprehensive, actionable learning paths.',
             }
           });
@@ -302,24 +302,39 @@ export class HTACore {
   }
 
   async buildHTATree(args) {
+    // Enhanced parameter debugging and validation
+    console.error('🔍 HTACore.buildHTATree called with args:', JSON.stringify(args, null, 2));
+    
     // Use activePath from config if not provided
     const activeProject = await this.projectManagement.getActiveProject();
     if (!activeProject || !activeProject.project_id) {
       throw new Error('No active project found. Please create a project using create_project_forest or switch to an existing project using switch_project_forest first.');
     }
     const projectId = activeProject.project_id;
+    console.error('✅ Active project found:', projectId);
+    
     const config = await this.dataPersistence.loadProjectData(projectId, 'config.json');
+    console.error('📁 Project config loaded:', config ? 'Found' : 'Not found');
+    if (config) {
+      console.error('📁 Config goal:', config.goal);
+      console.error('📁 Config context:', config.context);
+    }
+    
     const pathName = args.path_name || args.pathName || (config && config.activePath) || 'general';
     const learningStyle = args.learning_style || args.learningStyle || 'mixed';
     const focusAreas = args.focus_areas || args.focusAreas || [];
     const goalOverride = args.goal;
     const contextOverride = args.context;
     
-    // Parameter logging for debugging
-    console.error('HTACore.buildHTATree called with args:', args);
-    console.error('HTACore.buildHTATree extracted parameters:', {
-      pathName, learningStyle, focusAreas, goalOverride, contextOverride
-    });
+    // Enhanced parameter logging for debugging
+    console.error('🔍 HTACore.buildHTATree parameter extraction:');
+    console.error('  - pathName:', pathName);
+    console.error('  - learningStyle:', learningStyle);
+    console.error('  - focusAreas:', focusAreas);
+    console.error('  - goalOverride:', goalOverride);
+    console.error('  - contextOverride:', contextOverride);
+    console.error('  - config.goal:', config?.goal);
+    console.error('  - config.context:', config?.context);
     
     try {
       if (!this.projectManagement) {
@@ -359,11 +374,27 @@ export class HTACore {
         };
       }
 
-      const goal = goalOverride || config.goal || onboardingState.goal;
+      // Enhanced goal resolution with detailed debugging
+      console.error('🎯 Goal resolution process:');
+      console.error('  - goalOverride:', goalOverride);
+      console.error('  - config.goal:', config?.goal);
+      console.error('  - onboardingState.goal:', onboardingState?.goal);
+      
+      const goal = goalOverride || config?.goal || onboardingState?.goal;
+      console.error('  - Final resolved goal:', goal);
+      
       if (!goal) {
+        console.error('❌ Goal resolution failed - no goal found in any source');
         throw new Error('Goal must be provided either in project configuration or as a parameter. Use start_learning_journey_forest to set a project goal through gated onboarding.');
       }
-      const context = contextOverride || config.context || onboardingState.context || '';
+      
+      console.error('🌍 Context resolution process:');
+      console.error('  - contextOverride:', contextOverride);
+      console.error('  - config.context:', config?.context);
+      console.error('  - onboardingState.context:', onboardingState?.context);
+      
+      const context = contextOverride || config?.context || onboardingState?.context || '';
+      console.error('  - Final resolved context:', context);
       
       // Use comprehensive context from onboarding if available
       const comprehensiveContext = onboardingState.aggregate_context || {
@@ -418,9 +449,14 @@ export class HTACore {
       if (this.pureSchemaHTA && htaData.frontierNodes.length === 0) {
         try {
           console.log('🧠 Generating comprehensive HTA tree using Pure Schema-Driven Intelligence with Enhanced 6-Level Architecture');
+          console.error('🔍 Schema HTA parameters before generation:');
+          console.error('  - goal:', goal);
+          console.error('  - comprehensiveContext:', JSON.stringify(comprehensiveContext, null, 2));
           
           // Generate complete 6-level HTA tree foundation
           const schemaHTATree = await this.pureSchemaHTA.generateHTATree(goal, comprehensiveContext);
+          console.error('✅ Schema HTA tree generated successfully');
+          console.error('🔍 Generated tree structure:', Object.keys(schemaHTATree || {}));
           
           // Extract Level 1: Goal Context
           htaData.level1_goalContext = schemaHTATree.level1_goalContext;
