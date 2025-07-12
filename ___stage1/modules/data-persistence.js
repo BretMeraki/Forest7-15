@@ -7,7 +7,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import { FILE_NAMES, DEFAULT_PATHS } from './memory-sync.js';
-import { CacheManager } from './stubs/cache-manager.js';
+import { SQLiteCacheManager } from './stubs/sqlite-cache-manager.js';
 import { projectOperationManager } from './project-operation-manager.js';
 // Use stderr for logging to avoid interfering with MCP JSON-RPC on stdout
 const loggerModule = {
@@ -40,7 +40,7 @@ const dataDirGlobal = process.env.FOREST_DATA_DIR || path.join(os.homedir(), '.f
 export class DataPersistence {
   constructor(dataDir) {
     this.dataDir = dataDir || dataDirGlobal;
-    this.cache = new CacheManager();
+    this.cache = new SQLiteCacheManager();
     this.transactions = new Map(); // Active transactions
     this.logger = null; // Will be initialized lazily
   }

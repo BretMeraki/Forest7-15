@@ -670,49 +670,98 @@ export class GatedOnboardingFlow {
 
   async validateGoalClarity(goal) {
     try {
-      const prompt = `Analyze this learning goal for clarity and actionability:
-
-Goal: "${goal}"
-
-Assessment criteria:
-1. Is the goal specific and measurable?
-2. Is it achievable with structured learning?
-3. Are there clear success indicators?
-4. Is the domain well-defined?
-
-Response format:
-{
-  "isValid": boolean,
-  "clarity_score": 1-10,
-  "refinedGoal": "improved version if needed",
-  "message": "explanation",
-  "suggestions": ["array of suggestions if invalid"]
-}`;
-
-      const response = await this.coreIntelligence.generateLogicalDeductions({
-        context: 'Goal validation for onboarding',
-        prompt
-      });
-
-      return response.isValid ? response : {
-        isValid: false,
-        message: 'Your goal is too broad to create a personalized learning journey.',
-        suggestions: [
-          'Please provide a clear and specific goal, such as:',
-          '• "Build a React dashboard with real-time updates"',
-          '• "Master JavaScript async patterns"',
-          '• "Create a 3D portfolio website using Three.js"'
-        ]
+      // CRITICAL FIX: Use local validation logic instead of broken generateLogicalDeductions
+      // This prevents well-formed goals from being rejected as "too broad"
+      
+      if (!goal || typeof goal !== 'string') {
+        return {
+          isValid: false,
+          message: 'Please provide a learning goal.',
+          suggestions: ['Enter a specific goal like "Learn Python for data analysis"']
+        };
+      }
+      
+      const trimmedGoal = goal.trim();
+      
+      // Very basic validation - only reject truly problematic goals
+      if (trimmedGoal.length < 10) {
+        return {
+          isValid: false,
+          message: 'Your goal seems too short. Please provide more detail.',
+          suggestions: [
+            'Add more context about what you want to learn',
+            'Include what you want to achieve or build'
+          ]
+        };
+      }
+      
+      // Check for completely generic goals that have no learning content
+      const veryGenericPatterns = [
+        /^(learn|study|understand)\s*$/i,
+        /^(get better|improve|become good)\s*$/i,
+        /^(help|assist|support)\s*$/i,
+        /^(test|testing|check)\s*$/i
+      ];
+      
+      if (veryGenericPatterns.some(pattern => pattern.test(trimmedGoal))) {
+        return {
+          isValid: false,
+          message: 'Please be more specific about what you want to learn.',
+          suggestions: [
+            'Add the subject area you want to focus on',
+            'Include what you want to be able to do afterward'
+          ]
+        };
+      }
+      
+      // All other goals are considered valid - let the HTA system handle complexity
+      // This is much more lenient and prevents false rejections
+      
+      // Extract basic domain hints for context
+      const domainHints = this.extractDomainHints(trimmedGoal);
+      const timelineHints = this.extractTimelineHints(trimmedGoal);
+      
+      return {
+        isValid: true,
+        clarity_score: this.calculateBasicClarityScore(trimmedGoal),
+        refinedGoal: trimmedGoal,
+        message: '✅ Goal accepted - creating your personalized learning journey!',
+        measurability: this.assessMeasurability(trimmedGoal),
+        domain_hints: domainHints,
+        timeline_hints: timelineHints
       };
-
+      
     } catch (error) {
       console.error('Goal validation failed:', error);
+      // Even on error, be lenient - don't block the user
       return {
-        isValid: false,
-        message: 'Goal validation failed - please refine your goal',
-        suggestions: ['Try a more specific goal', 'Include what you want to achieve']
+        isValid: true,
+        clarity_score: 6,
+        refinedGoal: goal,
+        message: '✅ Goal accepted (validation had issues but proceeding)',
+        measurability: 'medium'
       };
     }
+  }
+
+  calculateBasicClarityScore(goal) {
+    // Simple scoring based on length and presence of key indicators
+    let score = 5;
+    if (goal.length >= 20) score += 1;
+    if (/\b(build|create|develop|master|design|analyze|optimize)\b/.test(goal.toLowerCase())) score += 1.5;
+    if (/\b(finish|complete|achieve|reach|gain)\b/.test(goal.toLowerCase())) score += 1.5;
+    return Math.min(score, 10);
+  }
+
+  assessMeasurability(goal) {
+    // Very rudimentary measurability assessment
+    if (/\b(measurable|quantifiable|metrics|kpis|goals)\b/.test(goal.toLowerCase())) {
+      return 'high';
+    }
+    if (/\b(improve|better|more|less)\b/.test(goal.toLowerCase())) {
+      return 'medium';
+    }
+    return 'low';
   }
 
   async generateContextSummary(goal, contextData) {

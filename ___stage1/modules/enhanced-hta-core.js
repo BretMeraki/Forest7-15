@@ -976,8 +976,8 @@ export class EnhancedHTACore extends HTACore {
     
     // Base branches that work for any goal
     branches.push(
-  { name: `${capitalizedTopic} Foundations`, description: `Build strong foundations and core understanding`, priority: 1 },
-{ name: `${capitalizedTopic} Application`, description: `Apply concepts in practical scenarios`, priority: 2 },
+      { name: `${capitalizedTopic} Foundations`, description: `Establish foundational knowledge and core understanding`, priority: 1 },
+      { name: `${capitalizedTopic} Application`, description: `Apply concepts in practical scenarios`, priority: 2 },
       { name: `${capitalizedTopic} Mastery`, description: `Achieve proficiency and expertise`, priority: 3 }
     );
     

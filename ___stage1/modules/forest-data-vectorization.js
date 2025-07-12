@@ -704,6 +704,78 @@ class ForestDataVectorization {
     
     return status;
   }
+
+  /**
+   * Get vectorization status for a specific project
+   */
+  async getVectorizationStatus(projectId) {
+    if (!this.initialized) await this.initialize();
+    
+    try {
+      // Get project stats from vector store
+      const vectorStats = await this.vectorStore.getProjectStats(projectId);
+      
+      // Get metadata from JSON files
+      const goalMetadata = await this.dataPersistence.loadProjectData(projectId, 'goal_metadata.json');
+      const branchMetadata = await this.dataPersistence.loadProjectData(projectId, 'branch_metadata.json');
+      const taskMetadata = await this.dataPersistence.loadProjectData(projectId, 'task_metadata.json');
+      
+      const isVectorized = vectorStats.vectorCount > 0;
+      const lastVectorized = Math.max(
+        goalMetadata?.last_vectorized ? new Date(goalMetadata.last_vectorized).getTime() : 0,
+        branchMetadata?.last_vectorized ? new Date(branchMetadata.last_vectorized).getTime() : 0,
+        taskMetadata?.last_vectorized ? new Date(taskMetadata.last_vectorized).getTime() : 0
+      );
+      
+      return {
+        isVectorized,
+        vectorCount: vectorStats.vectorCount || 0,
+        lastUpdated: lastVectorized > 0 ? new Date(lastVectorized).toISOString() : null,
+        breakdown: {
+          goals: goalMetadata ? 1 : 0,
+          branches: branchMetadata?.branches?.length || 0,
+          tasks: taskMetadata?.tasks?.length || 0
+        },
+        vectorStoreStatus: await this.getVectorStoreStatus()
+      };
+      
+    } catch (error) {
+      console.error('[ForestDataVectorization] Error getting vectorization status:', error.message);
+      return {
+        isVectorized: false,
+        vectorCount: 0,
+        lastUpdated: null,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Vectorize project data (wrapper for bulkVectorizeProject)
+   */
+  async vectorizeProjectData(projectId) {
+    if (!this.initialized) await this.initialize();
+    
+    try {
+      const results = await this.bulkVectorizeProject(projectId);
+      
+      return {
+        success: true,
+        vectorCount: results.vectorized,
+        dataTypes: Object.keys(results.types),
+        breakdown: results.types,
+        errors: results.errors
+      };
+      
+    } catch (error) {
+      console.error('[ForestDataVectorization] Error vectorizing project data:', error.message);
+      return {
+        success: false,
+        error: error.message,
+        vectorCount: 0
+      };
+    }
+  }
 }
 
 export { ForestDataVectorization, VECTORIZATION_TYPES, JSON_ONLY_FIELDS };

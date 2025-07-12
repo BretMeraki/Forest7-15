@@ -12,37 +12,130 @@ export class HTATaskGeneration {
   }
 
   initializeTaskTemplates() {
-    // Pure schema-driven task generation - no hardcoded templates
-    // This method now returns task generation patterns based on goal characteristics
     return {
+      // Phase-specific task templates
+      foundation: {
+        research: {
+          name: 'Research {topic} fundamentals',
+          description: 'Study and understand the basic concepts of {topic}',
+          type: 'research',
+          difficulty: 2,
+          estimatedDuration: 45,
+          deliverable: 'Research notes on {topic}',
+          successCriteria: 'Can explain key concepts of {topic}'
+        },
+        practice: {
+          name: 'Practice {topic} basics',
+          description: 'Apply basic {topic} concepts through hands-on exercises',
+          type: 'practice',
+          difficulty: 3,
+          estimatedDuration: 60,
+          deliverable: 'Completed basic {topic} exercises',
+          successCriteria: 'Successfully complete fundamental {topic} tasks'
+        },
+        setup: {
+          name: 'Set up {tool} environment',
+          description: 'Install and configure {tool} for {topic} development',
+          type: 'setup',
+          difficulty: 2,
+          estimatedDuration: 30,
+          deliverable: 'Working {tool} environment',
+          successCriteria: 'Can create and run basic {topic} projects'
+        }
+      },
+      research: {
+        investigate: {
+          name: 'Investigate {concept} in detail',
+          description: 'Deep dive into {concept} and its applications',
+          type: 'research',
+          difficulty: 4,
+          estimatedDuration: 90,
+          deliverable: 'Detailed research document on {concept}',
+          successCriteria: 'Can discuss {concept} with technical depth'
+        },
+        analyze: {
+          name: 'Analyze {example} implementation',
+          description: 'Study how {concept} is implemented in {example}',
+          type: 'analysis',
+          difficulty: 5,
+          estimatedDuration: 75,
+          deliverable: 'Analysis report of {example}',
+          successCriteria: 'Can identify key implementation patterns'
+        }
+      },
+      capability: {
+        build: {
+          name: 'Build {project} using {skill}',
+          description: 'Create a working {project} that demonstrates {skill}',
+          type: 'build',
+          difficulty: 6,
+          estimatedDuration: 120,
+          deliverable: 'Functional {project}',
+          successCriteria: 'Project meets all specified requirements'
+        },
+        implement: {
+          name: 'Implement {feature} in {project}',
+          description: 'Add {feature} functionality to your {project}',
+          type: 'implementation',
+          difficulty: 5,
+          estimatedDuration: 90,
+          deliverable: 'Working {feature} implementation',
+          successCriteria: '{feature} works as specified'
+        }
+      },
+      implementation: {
+        develop: {
+          name: 'Develop complete {application}',
+          description: 'Build a full-featured {application} using {skill}',
+          type: 'development',
+          difficulty: 7,
+          estimatedDuration: 180,
+          deliverable: 'Complete {application}',
+          successCriteria: 'Application is fully functional and tested'
+        },
+        integrate: {
+          name: 'Integrate {system} with {tool}',
+          description: 'Connect {system} to work with {tool}',
+          type: 'integration',
+          difficulty: 6,
+          estimatedDuration: 120,
+          deliverable: 'Integrated {system}',
+          successCriteria: 'Systems work together seamlessly'
+        }
+      },
+      mastery: {
+        innovate: {
+          name: 'Innovate on {concept} techniques',
+          description: 'Develop new approaches or improvements to {concept}',
+          type: 'innovation',
+          difficulty: 9,
+          estimatedDuration: 240,
+          deliverable: 'Novel {concept} implementation',
+          successCriteria: 'Shows clear improvement over existing approaches'
+        },
+        mentor: {
+          name: 'Mentor others in {skill}',
+          description: 'Teach and guide others learning {skill}',
+          type: 'mentoring',
+          difficulty: 8,
+          estimatedDuration: 180,
+          deliverable: 'Mentoring sessions and materials',
+          successCriteria: 'Mentees show measurable progress'
+        }
+      },
+      // Pattern configurations for dynamic generation
       patterns: {
-        // Task type patterns that work for any domain
         exploration: { baseTime: 30, difficultyRange: [1, 3] },
         learning: { baseTime: 45, difficultyRange: [2, 4] },
         practice: { baseTime: 90, difficultyRange: [3, 6] },
         creation: { baseTime: 120, difficultyRange: [4, 7] },
         mastery: { baseTime: 180, difficultyRange: [5, 9] }
       },
-      // Domain-agnostic task characteristics
       characteristics: {
         introductory: { timeMultiplier: 0.8, difficultyAdjust: -1 },
         intermediate: { timeMultiplier: 1.0, difficultyAdjust: 0 },
         advanced: { timeMultiplier: 1.5, difficultyAdjust: +2 },
         expert: { timeMultiplier: 2.0, difficultyAdjust: +3 }
-      },
-      // Context-sensitive adjustments
-      contextAdjustments: {
-        urgency: {
-          low: { timeMultiplier: 1.2 },
-          medium: { timeMultiplier: 1.0 },
-          high: { timeMultiplier: 0.8 }
-        },
-        learningStyle: {
-          visual: { preferredTypes: ['exploration', 'learning'] },
-          hands_on: { preferredTypes: ['practice', 'creation'] },
-          reading: { preferredTypes: ['learning', 'mastery'] },
-          mixed: { preferredTypes: ['exploration', 'learning', 'practice'] }
-        }
       }
     };
   }
@@ -139,9 +232,13 @@ export class HTATaskGeneration {
       goal: goal,
       branchName: branch.name,
       branchDescription: branch.description,
+      domain: this.extractDomain(goal),
       // Generate context-aware elements based on the actual goal content
       activities: this.generateGoalBasedActivities(goal, branch),
-      concepts: this.generateGoalBasedConcepts(goal, branch),
+      concepts: this.extractConcepts(branch, goal),
+      tools: this.extractTools(goal),
+      examples: this.generateExamples(branch, goal),
+      skills: this.extractSkills(branch, goal),
       outcomes: this.generateGoalBasedOutcomes(goal, branch)
     };
     
@@ -518,5 +615,232 @@ export class HTATaskGeneration {
     }
     
     return Math.round(duration);
+  }
+
+  generateGoalBasedActivities(goal, parameters = {}) {
+    // Generate activities based on the goal and contextual parameters
+    const activities = [];
+    
+    // Extract subject matter from goal
+    const subject = this.extractMainSubject(goal);
+    const tools = this.extractTools(goal);
+    const concepts = this.extractConcepts(goal);
+    
+    // Generate foundational activities
+    if (concepts.length > 0) {
+      activities.push({
+        type: 'foundational',
+        name: `Learn core concepts in ${subject}`,
+        description: `Study and understand the fundamental concepts of ${concepts.join(', ')}`,
+        priority: 'high',
+        category: 'theory'
+      });
+    }
+    
+    // Generate practice activities
+    if (tools.length > 0) {
+      activities.push({
+        type: 'practice',
+        name: `Practice with ${tools.join(' and ')}`,
+        description: `Gain hands-on experience using ${tools.join(', ')} for ${subject}`,
+        priority: 'medium',
+        category: 'practical'
+      });
+    }
+    
+    // Generate application activities
+    activities.push({
+      type: 'application',
+      name: `Apply ${subject} knowledge`,
+      description: `Create or work on projects that demonstrate understanding of ${subject}`,
+      priority: 'high',
+      category: 'application'
+    });
+    
+    // Generate assessment activities
+    activities.push({
+      type: 'assessment',
+      name: `Evaluate ${subject} progress`,
+      description: `Test and validate understanding through exercises and self-assessment`,
+      priority: 'medium',
+      category: 'evaluation'
+    });
+    
+    return activities;
+  }
+
+  generateGoalBasedConcepts(goal, parameters = {}) {
+    // Generate concepts based on the goal and contextual parameters
+    const concepts = [];
+    
+    // Extract base concepts from goal
+    const baseConcepts = this.extractConcepts(goal);
+    const subject = this.extractMainSubject(goal);
+    
+    // Add foundational concepts
+    concepts.push({
+      type: 'foundational',
+      name: `${subject} fundamentals`,
+      description: `Core principles and basic understanding of ${subject}`,
+      complexity: 'beginner',
+      prerequisites: []
+    });
+    
+    // Add extracted concepts with more detail
+    baseConcepts.forEach(concept => {
+      concepts.push({
+        type: 'core',
+        name: concept,
+        description: `Understanding and application of ${concept} in ${subject}`,
+        complexity: 'intermediate',
+        prerequisites: [`${subject} fundamentals`]
+      });
+    });
+    
+    // Add advanced concepts
+    if (baseConcepts.length > 0) {
+      concepts.push({
+        type: 'advanced',
+        name: `Advanced ${subject} techniques`,
+        description: `Complex applications and advanced methods in ${subject}`,
+        complexity: 'advanced',
+        prerequisites: baseConcepts
+      });
+    }
+    
+    // Add integration concepts
+    concepts.push({
+      type: 'integration',
+      name: `${subject} best practices`,
+      description: `Professional standards and best practices for ${subject}`,
+      complexity: 'intermediate',
+      prerequisites: baseConcepts.slice(0, 2) // First two concepts
+    });
+    
+    return concepts;
+  }
+
+  generateGoalBasedOutcomes(goal, parameters = {}) {
+    // Generate learning outcomes based on the goal and contextual parameters
+    const outcomes = [];
+    
+    const subject = this.extractMainSubject(goal);
+    const tools = this.extractTools(goal);
+    const concepts = this.extractConcepts(goal);
+    const skills = this.extractSkills(goal);
+    
+    // Knowledge outcomes
+    outcomes.push({
+      type: 'knowledge',
+      category: 'understanding',
+      statement: `Demonstrate comprehensive understanding of ${subject} principles and concepts`,
+      measurable: true,
+      assessmentMethod: 'written explanation and concept mapping'
+    });
+    
+    // Skill outcomes
+    if (skills.length > 0) {
+      outcomes.push({
+        type: 'skill',
+        category: 'application',
+        statement: `Successfully apply ${skills.join(', ')} in practical scenarios`,
+        measurable: true,
+        assessmentMethod: 'practical demonstration and project work'
+      });
+    }
+    
+    // Tool proficiency outcomes
+    if (tools.length > 0) {
+      outcomes.push({
+        type: 'proficiency',
+        category: 'technical',
+        statement: `Achieve proficiency in using ${tools.join(', ')} for ${subject}`,
+        measurable: true,
+        assessmentMethod: 'hands-on exercises and tool-based projects'
+      });
+    }
+    
+    // Problem-solving outcomes
+    outcomes.push({
+      type: 'problem_solving',
+      category: 'analysis',
+      statement: `Analyze and solve complex problems in ${subject} domain`,
+      measurable: true,
+      assessmentMethod: 'case studies and problem-solving exercises'
+    });
+    
+    // Creative/synthesis outcomes
+    outcomes.push({
+      type: 'synthesis',
+      category: 'creation',
+      statement: `Create original work or solutions that demonstrate mastery of ${subject}`,
+      measurable: true,
+      assessmentMethod: 'portfolio development and original project creation'
+    });
+    
+    // Professional readiness outcomes
+    outcomes.push({
+      type: 'professional',
+      category: 'readiness',
+      statement: `Apply ${subject} knowledge in professional or real-world contexts`,
+      measurable: true,
+      assessmentMethod: 'professional simulation or real-world application'
+    });
+    
+    return outcomes;
+  }
+
+  /**
+   * Extract domain from goal or subject
+   * @param {string} goal - The learning goal or subject
+   * @returns {string} - The extracted domain
+   */
+  extractDomain(goal) {
+    if (!goal || typeof goal !== 'string') {
+      return 'general';
+    }
+
+    // Convert to lowercase for consistent matching
+    const lowercaseGoal = goal.toLowerCase();
+    
+    // Common domain keywords mapping
+    const domainKeywords = {
+      'technology': ['programming', 'coding', 'software', 'development', 'tech', 'computer', 'web', 'app', 'javascript', 'python', 'java', 'react', 'node', 'database', 'api', 'framework', 'library', 'algorithm', 'data structure'],
+      'business': ['business', 'management', 'marketing', 'finance', 'accounting', 'sales', 'strategy', 'entrepreneurship', 'startup', 'leadership', 'operations', 'hr', 'human resources'],
+      'science': ['science', 'physics', 'chemistry', 'biology', 'mathematics', 'research', 'experiment', 'analysis', 'theory', 'hypothesis', 'data', 'statistics'],
+      'arts': ['art', 'creative', 'writing', 'music', 'drawing', 'painting', 'photography', 'video', 'animation', 'graphic', 'visual', 'aesthetic'],
+      'design': ['design', 'ui', 'ux', 'interface', 'website', 'layout', 'wireframe', 'prototype', 'figma', 'sketch'],
+      'health': ['health', 'medicine', 'medical', 'fitness', 'nutrition', 'wellness', 'psychology', 'therapy', 'mental health', 'physical'],
+      'education': ['teaching', 'education', 'learning', 'instruction', 'pedagogy', 'curriculum', 'assessment', 'student', 'academic'],
+      'language': ['language', 'english', 'spanish', 'french', 'german', 'chinese', 'japanese', 'communication', 'writing', 'speaking', 'translation'],
+      'engineering': ['engineering', 'mechanical', 'electrical', 'civil', 'chemical', 'construction', 'manufacturing', 'automation', 'systems']
+    };
+
+    // Check for domain matches
+    for (const [domain, keywords] of Object.entries(domainKeywords)) {
+      if (keywords.some(keyword => lowercaseGoal.includes(keyword))) {
+        return domain;
+      }
+    }
+
+    // If no specific domain found, try to extract from common patterns
+    if (lowercaseGoal.includes('learn') || lowercaseGoal.includes('study') || lowercaseGoal.includes('master')) {
+      // Extract the main subject after common learning verbs
+      const subjectMatch = lowercaseGoal.match(/(?:learn|study|master|understand)\s+([a-zA-Z\s]+?)(?:\s+(?:to|for|in|with|using)|$)/);
+      if (subjectMatch && subjectMatch[1]) {
+        const subject = subjectMatch[1].trim();
+        // Check if this subject matches any domain keywords
+        for (const [domain, keywords] of Object.entries(domainKeywords)) {
+          if (keywords.some(keyword => subject.includes(keyword))) {
+            return domain;
+          }
+        }
+        // Return the subject itself if no domain match
+        return subject.replace(/\s+/g, '_');
+      }
+    }
+
+    // Default fallback
+    return 'general';
   }
 }

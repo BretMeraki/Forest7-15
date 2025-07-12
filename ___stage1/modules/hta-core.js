@@ -1336,7 +1336,7 @@ Return JSON format:
           {
             id: `${firstBranch.phase || 'foundation'}_intro_001`,
             title: `Introduction to ${firstBranch.name}`,
-            description: `Get started with ${firstBranch.description}`,
+            description: `Begin learning ${firstBranch.name} concepts and fundamentals`,
             phase: firstBranch.phase || 'foundation',
             branchId: firstBranch.id,
             difficulty: 2,
