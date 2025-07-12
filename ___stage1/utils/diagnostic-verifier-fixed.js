@@ -15,41 +15,12 @@ const execAsync = promisify(exec);
 
 export class DiagnosticVerifier {
   constructor(projectRoot = process.cwd()) {
-    // Detect Forest server directory when running through MCP
-    if (!projectRoot || projectRoot.includes('Claude') || projectRoot.includes('Anthropic')) {
-      // Try to find the Forest server directory
-      const possiblePaths = [
-        'C:\\Users\\schlansk\\Downloads\\7-3forest-main',
-        path.join(process.env.USERPROFILE || '', 'Downloads', '7-3forest-main'),
-        // Fallback to current working directory if Forest not found
-        process.cwd()
-      ];
-      
-      for (const testPath of possiblePaths) {
-        try {
-          // Check if this looks like the Forest server directory
-          const packageJsonPath = path.join(testPath, 'package.json');
-          const stage1Path = path.join(testPath, '___stage1');
-          if (require('fs').existsSync(packageJsonPath) && require('fs').existsSync(stage1Path)) {
-            projectRoot = testPath;
-            break;
-          }
-        } catch (error) {
-          // Continue to next path
-        }
-      }
-    }
-    
     // If running from ___stage1 directory, adjust to project root
     if (projectRoot.endsWith('___stage1')) {
       projectRoot = path.dirname(projectRoot);
     }
-    
     this.projectRoot = projectRoot;
     this.verificationLog = [];
-    
-    // Log the resolved project root for debugging
-    console.log(`[DiagnosticVerifier] Using project root: ${this.projectRoot}`);
   }
 
   /**

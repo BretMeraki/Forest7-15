@@ -1,8 +1,7 @@
 /**
- * Diagnostic Handlers - SQLite Compatible Version
+ * Diagnostic Handlers - Extracted from core server
  * 
  * Handles system diagnostics, health checks, and utility functions
- * Updated to work correctly with SQLite vector store architecture
  */
 
 export class DiagnosticHandlers {
@@ -184,21 +183,21 @@ export class DiagnosticHandlers {
         }
       }
 
-      // SQLite Vector Store health check with proper error handling
+      // SQLite Vector Store health check
       let vectorStoreHealthy = false;
       let vectorStoreStatus = null;
       if (this.vectorStore) {
         try {
           // Check if vector store is initialized and can perform basic operations
-          const isConnected = await this.safeVectorStorePing();
+          const isConnected = await this.vectorStore.ping();
           if (isConnected) {
-            const stats = await this.safeVectorStoreStats();
+            const stats = await this.vectorStore.getStats();
             vectorStoreStatus = {
               status: 'healthy',
               provider: 'SQLite',
-              vectorCount: stats?.vectorCount || 0,
-              dbPath: this.vectorStore.dbPath || 'unknown',
-              cacheUtilization: stats?.cacheUtilization || '0%'
+              vectorCount: stats.vectorCount,
+              dbPath: this.vectorStore.dbPath,
+              cacheUtilization: stats.cacheUtilization
             };
             vectorStoreHealthy = true;
           } else {
@@ -207,8 +206,6 @@ export class DiagnosticHandlers {
         } catch (error) {
           vectorStoreStatus = { status: 'error', reason: error.message };
         }
-      } else {
-        vectorStoreStatus = { status: 'not_configured', reason: 'Vector store not initialized' };
       }
 
       const memory = process.memoryUsage();
@@ -241,72 +238,6 @@ export class DiagnosticHandlers {
         }],
         error: error.message
       };
-    }
-  }
-
-  /**
-   * Safe wrapper for vector store ping with fallbacks
-   */
-  async safeVectorStorePing() {
-    if (!this.vectorStore) return false;
-    
-    try {
-      // Check if ping method exists and is a function
-      if (typeof this.vectorStore.ping === 'function') {
-        return await this.vectorStore.ping();
-      }
-      
-      // Fallback: check if isHealthy method exists
-      if (typeof this.vectorStore.isHealthy === 'function') {
-        return await this.vectorStore.isHealthy();
-      }
-      
-      // Fallback: check if initialized property exists
-      if (typeof this.vectorStore.initialized === 'boolean') {
-        return this.vectorStore.initialized;
-      }
-      
-      // Last resort: assume healthy if object exists
-      return true;
-    } catch (error) {
-      console.warn('Vector store ping failed:', error.message);
-      return false;
-    }
-  }
-
-  /**
-   * Safe wrapper for vector store stats with fallbacks
-   */
-  async safeVectorStoreStats() {
-    if (!this.vectorStore) return null;
-    
-    try {
-      // Check if getStats method exists and is a function
-      if (typeof this.vectorStore.getStats === 'function') {
-        return await this.vectorStore.getStats();
-      }
-      
-      // Fallback: check if status method exists
-      if (typeof this.vectorStore.status === 'function') {
-        return await this.vectorStore.status();
-      }
-      
-      // Manual stats construction from available properties
-      const stats = {};
-      if (this.vectorStore.cache?.size !== undefined) {
-        stats.cacheSize = this.vectorStore.cache.size;
-      }
-      if (this.vectorStore.maxCacheSize !== undefined) {
-        stats.maxCacheSize = this.vectorStore.maxCacheSize;
-        if (stats.cacheSize !== undefined) {
-          stats.cacheUtilization = ((stats.cacheSize / stats.maxCacheSize) * 100).toFixed(2) + '%';
-        }
-      }
-      
-      return Object.keys(stats).length > 0 ? stats : null;
-    } catch (error) {
-      console.warn('Vector store stats retrieval failed:', error.message);
-      return null;
     }
   }
 
@@ -420,7 +351,7 @@ export class DiagnosticHandlers {
   }
 
   /**
-   * Get Vector Store status (SQLite-based) with robust error handling
+   * Get Vector Store status (SQLite-based)
    */
   async getVectorStoreStatus(args) {
     try {
@@ -434,23 +365,23 @@ export class DiagnosticHandlers {
         };
       }
 
-      const isConnected = await this.safeVectorStorePing();
-      const stats = await this.safeVectorStoreStats();
-      const cacheStats = this.safeGetCacheStats();
+      const isConnected = await this.vectorStore.ping();
+      const stats = await this.vectorStore.getStats();
+      const cacheStats = this.vectorStore.getCacheStats();
       
       let statusText = `**🗃️ SQLite Vector Store Status**\n\n`;
       
       // Connection status
       statusText += `**Connection**: ${isConnected ? '✅ Connected' : '❌ Disconnected'}\n`;
-      statusText += `**Database Path**: ${this.vectorStore.dbPath || 'Unknown'}\n`;
-      statusText += `**Dimension**: ${this.vectorStore.dimension || 'Unknown'}\n`;
+      statusText += `**Database Path**: ${this.vectorStore.dbPath}\n`;
+      statusText += `**Dimension**: ${this.vectorStore.dimension}\n`;
       statusText += `**Initialized**: ${this.vectorStore.initialized ? '✅ Yes' : '❌ No'}\n\n`;
       
       // Statistics
       statusText += `**Statistics**\n`;
-      statusText += `• Vector Count: ${stats?.vectorCount || 0}\n`;
-      statusText += `• Average Vector Size: ${stats?.averageVectorSize ? (stats.averageVectorSize / 1024).toFixed(2) + ' KB' : 'N/A'}\n`;
-      statusText += `• Total Database Size: ${stats?.totalSize ? (stats.totalSize / 1024).toFixed(2) + ' KB' : 'N/A'}\n\n`;
+      statusText += `• Vector Count: ${stats.vectorCount}\n`;
+      statusText += `• Average Vector Size: ${stats.averageVectorSize ? (stats.averageVectorSize / 1024).toFixed(2) + ' KB' : 'N/A'}\n`;
+      statusText += `• Total Database Size: ${stats.totalSize ? (stats.totalSize / 1024).toFixed(2) + ' KB' : 'N/A'}\n\n`;
       
       // Cache information
       statusText += `**Cache Performance**\n`;
@@ -491,51 +422,6 @@ export class DiagnosticHandlers {
         }],
         error: error.message,
         success: false
-      };
-    }
-  }
-
-  /**
-   * Safe wrapper for getting cache stats
-   */
-  safeGetCacheStats() {
-    if (!this.vectorStore) {
-      return {
-        size: 0,
-        maxSize: 0,
-        utilization: '0%',
-        accessCounter: 0,
-        oldestAccess: null,
-        newestAccess: null
-      };
-    }
-
-    try {
-      // Check if getCacheStats method exists
-      if (typeof this.vectorStore.getCacheStats === 'function') {
-        return this.vectorStore.getCacheStats();
-      }
-
-      // Fallback: construct stats manually
-      const size = this.vectorStore.cache?.size || 0;
-      const maxSize = this.vectorStore.maxCacheSize || 1000;
-      return {
-        size,
-        maxSize,
-        utilization: ((size / maxSize) * 100).toFixed(2) + '%',
-        accessCounter: this.vectorStore.accessCounter || 0,
-        oldestAccess: null,
-        newestAccess: null
-      };
-    } catch (error) {
-      console.warn('Failed to get cache stats:', error.message);
-      return {
-        size: 0,
-        maxSize: 0,
-        utilization: '0%',
-        accessCounter: 0,
-        oldestAccess: null,
-        newestAccess: null
       };
     }
   }
@@ -619,36 +505,30 @@ export class DiagnosticHandlers {
       let statusText = `**🔧 Optimizing SQLite Vector Store...**\n\n`;
       
       // Get initial stats
-      const initialStats = await this.safeVectorStoreStats();
+      const initialStats = await this.vectorStore.getStats();
       statusText += `**Initial Stats:**\n`;
-      statusText += `• Vectors: ${initialStats?.vectorCount || 0}\n`;
-      statusText += `• Database size: ${initialStats?.totalSize ? (initialStats.totalSize / 1024).toFixed(2) + ' KB' : 'Unknown'}\n\n`;
+      statusText += `• Vectors: ${initialStats.vectorCount}\n`;
+      statusText += `• Database size: ${(initialStats.totalSize / 1024).toFixed(2)} KB\n\n`;
       
       // Perform optimization
       statusText += `**Optimization Steps:**\n`;
       
-      // 1. Flush and checkpoint WAL if method exists
-      if (typeof this.vectorStore.flush === 'function') {
-        await this.vectorStore.flush();
-        statusText += `• ✅ WAL checkpoint completed\n`;
-      } else {
-        statusText += `• ✅ Vector store optimization (auto-managed)\n`;
-      }
+      // 1. Flush and checkpoint WAL
+      await this.vectorStore.flush();
+      statusText += `• ✅ WAL checkpoint completed\n`;
       
       // 2. Get final stats
-      const finalStats = await this.safeVectorStoreStats();
+      const finalStats = await this.vectorStore.getStats();
       statusText += `• ✅ Statistics updated\n\n`;
       
       statusText += `**Final Stats:**\n`;
-      statusText += `• Vectors: ${finalStats?.vectorCount || 0}\n`;
-      statusText += `• Database size: ${finalStats?.totalSize ? (finalStats.totalSize / 1024).toFixed(2) + ' KB' : 'Unknown'}\n`;
+      statusText += `• Vectors: ${finalStats.vectorCount}\n`;
+      statusText += `• Database size: ${(finalStats.totalSize / 1024).toFixed(2)} KB\n`;
       
       // Size comparison
-      if (initialStats?.totalSize && finalStats?.totalSize) {
-        const sizeDiff = initialStats.totalSize - finalStats.totalSize;
-        if (sizeDiff > 0) {
-          statusText += `• Space recovered: ${(sizeDiff / 1024).toFixed(2)} KB\n`;
-        }
+      const sizeDiff = initialStats.totalSize - finalStats.totalSize;
+      if (sizeDiff > 0) {
+        statusText += `• Space recovered: ${(sizeDiff / 1024).toFixed(2)} KB\n`;
       }
       
       statusText += `\n**Optimization Complete!** ✅\n`;
@@ -658,8 +538,7 @@ export class DiagnosticHandlers {
         content: [{ type: 'text', text: statusText }],
         initial_stats: initialStats,
         final_stats: finalStats,
-        space_recovered: (initialStats?.totalSize && finalStats?.totalSize) ? 
-          initialStats.totalSize - finalStats.totalSize : 0,
+        space_recovered: sizeDiff,
         success: true
       };
     } catch (error) {

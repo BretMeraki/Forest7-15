@@ -17,7 +17,19 @@
       "goal": "Learn Python programming fundamentals",
       "created_at": "2025-07-11T00:39:20.720Z",
       "last_accessed": "2025-07-11T00:39:20.730Z"
+    },
+    {
+      "id": "learn_python_programming_1dva",
+      "goal": "Learn Python programming fundamentals",
+      "created_at": "2025-07-11T20:08:15.478Z",
+      "last_accessed": "2025-07-11T20:08:15.486Z"
+    },
+    {
+      "id": "learn_python_programming_9x36",
+      "goal": "Learn Python programming fundamentals",
+      "created_at": "2025-07-11T20:14:53.635Z",
+      "last_accessed": "2025-07-11T20:14:53.643Z"
     }
   ],
-  "activeProject": "learn_python_programming_a5jk"
+  "activeProject": "learn_python_programming_9x36"
 }

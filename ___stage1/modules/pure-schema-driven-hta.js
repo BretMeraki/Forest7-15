@@ -406,9 +406,12 @@ export class PureSchemaHTASystem {
   async generateTaskDecomposition(branchName, branchDescription, goalContext, currentUserContext) {
     const refinedContext = await this.refineContextBasedOnLearning(currentUserContext);
     
+    // Extract goal to ensure it's available for prompt building
+    const goalText = this.extractGoalFromContext(refinedContext, goalContext);
+    
     return await this.generateLevelContent(
       'taskDecomposition',
-      { branchName, branchDescription, goalContext, userContext: refinedContext },
+      { branchName, branchDescription, goalContext, userContext: refinedContext, goal: goalText },
       "Break this strategic branch into practical, achievable tasks considering user's real-world constraints."
     );
   }
@@ -419,9 +422,12 @@ export class PureSchemaHTASystem {
   async generateMicroParticles(taskTitle, taskDescription, goalContext, currentUserContext) {
     const refinedContext = await this.refineContextBasedOnLearning(currentUserContext);
     
+    // Extract goal to ensure it's available for prompt building
+    const goalText = this.extractGoalFromContext(refinedContext, goalContext);
+    
     return await this.generateLevelContent(
       'microParticles',
-      { taskTitle, taskDescription, goalContext, userContext: refinedContext },
+      { taskTitle, taskDescription, goalContext, userContext: refinedContext, goal: goalText },
       "Create foolproof micro-tasks that are so small they cannot fail, with clear validation criteria."
     );
   }
@@ -432,9 +438,12 @@ export class PureSchemaHTASystem {
   async generateNanoActions(microTitle, microDescription, goalContext, currentUserContext) {
     const refinedContext = await this.refineContextBasedOnLearning(currentUserContext);
     
+    // Extract goal to ensure it's available for prompt building
+    const goalText = this.extractGoalFromContext(refinedContext, goalContext);
+    
     return await this.generateLevelContent(
       'nanoActions',
-      { microTitle, microDescription, goalContext, userContext: refinedContext },
+      { microTitle, microDescription, goalContext, userContext: refinedContext, goal: goalText },
       "Break this micro-task into granular execution steps accounting for tool switching and context changes."
     );
   }
@@ -445,9 +454,12 @@ export class PureSchemaHTASystem {
   async generateContextAdaptivePrimitives(nanoTitle, nanoDescription, goalContext, currentUserContext) {
     const refinedContext = await this.refineContextBasedOnLearning(currentUserContext);
     
+    // Extract goal to ensure it's available for prompt building
+    const goalText = this.extractGoalFromContext(refinedContext, goalContext);
+    
     return await this.generateLevelContent(
       'contextAdaptivePrimitives',
-      { nanoTitle, nanoDescription, goalContext, userContext: refinedContext },
+      { nanoTitle, nanoDescription, goalContext, userContext: refinedContext, goal: goalText },
       "Create fundamental actions that adapt to different user constraints and situations."
     );
   }

@@ -27,6 +27,8 @@ import { DiagnosticHandlers } from './modules/diagnostic-handlers.js';
 import { ForestDataVectorization } from './modules/forest-data-vectorization.js';
 import { ClaudeDiagnosticHelper } from './utils/claude-diagnostic-helper.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 // Replaced pino with simple stderr console logger to avoid JSON log leakage
 
@@ -95,7 +97,13 @@ class Stage1CoreServer {
     this.mcpCore = new McpCore(this.server);
     
     // Initialize diagnostic helper for preventing false positives
-    this.diagnosticHelper = new ClaudeDiagnosticHelper();
+    // Ensure it uses the Forest server directory, not the Claude app directory
+const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const forestProjectRoot = process.cwd().includes('Claude') || process.cwd().includes('Anthropic') 
+      ? path.dirname(__dirname) // __dirname is ___stage1, so go up one level
+      : process.cwd();
+    this.diagnosticHelper = new ClaudeDiagnosticHelper(forestProjectRoot);
     
     // Connect TaskStrategyCore to AmbiguousDesiresManager
     this.ambiguousDesiresManager.taskStrategyCore = this.taskStrategyCore;
@@ -157,7 +165,7 @@ class Stage1CoreServer {
     // Initialize diagnostic handlers
     this.diagnosticHandlers = new DiagnosticHandlers(
       this.diagnosticHelper,
-      this.chromaDBLifecycle,
+      null, // vectorStore will be set after initialization
       this.dataPersistence,
       this.projectManagement
     );
@@ -242,6 +250,9 @@ class Stage1CoreServer {
             // Connect vector store to gated onboarding and pipeline presenter
             this.gatedOnboarding.vectorStore = vectorStore;
             this.pipelinePresenter.vectorStore = vectorStore;
+            
+            // Connect vector store to diagnostic handlers
+            this.diagnosticHandlers.vectorStore = vectorStore;
           } else {
             console.error('⚠️ Vector store initialization returned null, continuing without vector support');
           }
@@ -298,7 +309,7 @@ class Stage1CoreServer {
         console.error(`[ToolRouter] Received tool call for: ${toolName}`);
         
         // FIRST INTERACTION: Always show landing page first, unless explicitly requesting it
-        if (!this.hasShownLandingPage && !['get_landing_page_forest', 'start_learning_journey_forest', 'list_projects_forest', 'continue_onboarding_forest', 'get_onboarding_status_forest', 'complete_onboarding_forest', 'get_next_pipeline_forest', 'evolve_pipeline_forest'].includes(toolName)) {
+        if (!this.hasShownLandingPage && !['get_landing_page_forest', 'start_learning_journey_forest', 'list_projects_forest', 'continue_onboarding_forest', 'get_onboarding_status_forest', 'complete_onboarding_forest', 'get_next_pipeline_forest', 'evolve_pipeline_forest', 'verify_function_exists_forest'].includes(toolName)) {
           this.hasShownLandingPage = true;
           console.error('[ToolRouter] First interaction detected - showing landing page first');
           const landingPageResult = await this.generateLandingPage();
@@ -340,7 +351,9 @@ class Stage1CoreServer {
             case 'get_hta_status_forest':
               result = await this.htaCore.getHTAStatus(); break;
             case 'get_next_task_forest':
-              result = await this.vectorizedHandlers.getNextTaskVectorized(args); break;
+              // CRITICAL FIX: Route directly to HTA task strategy core instead of MCP bridge
+              // This ensures users get actual HTA tasks instead of generic bridge responses
+              result = await this.taskStrategyCore.getNextTask(args); break;
             case 'complete_block_forest':
               result = await this.vectorizedHandlers.completeBlockVectorized(args); break;
             case 'evolve_strategy_forest':
@@ -443,6 +456,14 @@ class Stage1CoreServer {
               result = await this.diagnosticHandlers.debugCacheState(args); break;
             case 'emergency_clear_cache_forest':
               result = await this.diagnosticHandlers.emergencyClearCache(args); break;
+            case 'get_vector_store_status_forest':
+              result = await this.diagnosticHandlers.getVectorStoreStatus(args); break;
+            case 'optimize_vector_store_forest':
+              result = await this.diagnosticHandlers.optimizeVectorStore(args); break;
+            case 'get_chromadb_status_forest':
+              result = await this.diagnosticHandlers.getChromaDBStatus(args); break;
+            case 'restart_chromadb_forest':
+              result = await this.diagnosticHandlers.restartChromaDB(args); break;
             
             default:
               throw new Error(`Unknown tool: ${toolName}`);

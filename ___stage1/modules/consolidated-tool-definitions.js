@@ -677,7 +677,43 @@ export const FOREST_TOOLS = {
 
   get_health_status_forest: {
     name: 'get_health_status_forest',
-    description: 'Get comprehensive system health status including data directory, memory usage, and component status',
+    description: 'Get comprehensive system health status including data directory, SQLite vector store, memory usage, and component status',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  get_vector_store_status_forest: {
+    name: 'get_vector_store_status_forest',
+    description: 'Get detailed SQLite vector store status including connection, statistics, and cache performance',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  optimize_vector_store_forest: {
+    name: 'optimize_vector_store_forest',
+    description: 'Optimize SQLite vector store by performing WAL checkpoint and database maintenance',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  get_chromadb_status_forest: {
+    name: 'get_chromadb_status_forest',
+    description: 'Legacy ChromaDB command - provides migration information about SQLite vector store transition',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  restart_chromadb_forest: {
+    name: 'restart_chromadb_forest',
+    description: 'Legacy ChromaDB command - provides migration information about SQLite vector store benefits',
     inputSchema: {
       type: 'object',
       properties: {}
@@ -960,9 +996,15 @@ export const TOOL_CATEGORIES = {
     'debug_cache_forest',
     'emergency_clear_cache_forest'
   ],
-  'Vectorization Tools': [
+  'Vector Store Management': [
     'get_vectorization_status_forest',
-    'vectorize_project_data_forest'
+    'vectorize_project_data_forest',
+    'get_vector_store_status_forest',
+    'optimize_vector_store_forest'
+  ],
+  'Legacy Tools': [
+    'get_chromadb_status_forest',
+    'restart_chromadb_forest'
   ],
   'Ambiguous Desires': [
     'assess_goal_clarity_forest',

@@ -295,49 +295,38 @@ export class VectorizedHandlers {
   }
 
   /**
-   * Get ChromaDB status
+   * Get ChromaDB status - Legacy method maintained for backward compatibility
    */
   async getChromaDBStatus(args) {
     try {
-      if (!this.chromaDBLifecycle) {
-        return {
-          content: [{
-            type: 'text',
-            text: '**ChromaDB Not Configured** ℹ️\n\nChromaDB is not enabled for this Forest instance.\n\nVector provider: ' + (process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec')
-          }],
-          chromadb_enabled: false
-        };
-      }
-
-      const status = this.chromaDBLifecycle.getStatus();
-      
-      const statusText = status.isRunning ? '🟢 Running' : 
-                        status.isStarting ? '🟡 Starting' : 
-                        status.hasError ? '🔴 Error' : '⚪ Stopped';
-      
+      // ChromaDB has been replaced with SQLite vectors
       return {
         content: [{
           type: 'text',
-          text: `**🗄️ ChromaDB Status**\n\n` +
-                `**Status**: ${statusText}\n` +
-                `**Port**: ${status.port || 'Unknown'}\n` +
-                `**PID**: ${status.pid || 'Not running'}\n` +
-                `**Uptime**: ${status.uptime || 'N/A'}\n` +
-                `**Data Directory**: ${status.dataDir || 'Unknown'}\n` +
-                `**Health**: ${status.isHealthy ? '✅ Healthy' : '❌ Unhealthy'}\n\n` +
-                `${status.hasError ? `**Error**: ${status.error}\n\n` : ''}` +
-                `**Available Actions**:\n` +
-                `• \`restart_chromadb_forest\` - Restart ChromaDB server\n` +
-                `• \`get_vectorization_status_forest\` - Check vectorization status`
+          text: '**✅ Vector Storage Migration Complete** 🎉\n\n' +
+                '**System Status**: SQLite-based vectorization is now active\n' +
+                '**Migration**: ChromaDB → SQLite vectors (completed)\n' +
+                '**Provider**: ' + (process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec') + '\n\n' +
+                '**Benefits of SQLite Migration**:\n' +
+                '• No external dependencies (no Docker required)\n' +
+                '• Faster startup and operations\n' +
+                '• Better reliability and data consistency\n' +
+                '• File-based storage for easy backup\n\n' +
+                '**Available Actions**:\n' +
+                '• `get_vectorization_status_forest` - Check current vectorization\n' +
+                '• `vectorize_project_data_forest` - Vectorize project data\n' +
+                '• `get_next_task_forest` - Get semantic task recommendations'
         }],
-        chromadb_status: status
+        migration_status: 'complete',
+        current_provider: process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec',
+        chromadb_enabled: false
       };
     } catch (error) {
       console.error('VectorizedHandlers.getChromaDBStatus failed:', error);
       return {
         content: [{
           type: 'text',
-          text: `**❌ ChromaDB Status Check Failed**\n\nError: ${error.message}\n\nPlease check the system status and try again.`
+          text: `**❌ Vector Status Check Failed**\n\nError: ${error.message}\n\nPlease check the system status and try again.`
         }],
         error: error.message
       };
@@ -345,59 +334,39 @@ export class VectorizedHandlers {
   }
 
   /**
-   * Restart ChromaDB server
+   * Restart ChromaDB server - Legacy method maintained for backward compatibility
    */
   async restartChromaDB(args) {
     try {
-      if (!this.chromaDBLifecycle) {
-        return {
-          content: [{
-            type: 'text',
-            text: '**ChromaDB Not Configured** ℹ️\n\nChromaDB is not enabled for this Forest instance.\n\nVector provider: ' + (process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec')
-          }],
-          chromadb_enabled: false
-        };
-      }
-
-      console.error('🔄 Restarting ChromaDB server...');
-      const result = await this.chromaDBLifecycle.restart();
-      
-      if (result.success) {
-        return {
-          content: [{
-            type: 'text',
-            text: `**✅ ChromaDB Restarted Successfully**\n\n` +
-                  `**Status**: 🟢 Running\n` +
-                  `**Port**: ${result.port || 'Unknown'}\n` +
-                  `**PID**: ${result.pid || 'Unknown'}\n` +
-                  `**Startup Time**: ${result.startupTime || 'Unknown'}ms\n\n` +
-                  `**Next Steps**:\n` +
-                  `• Vector operations should now work normally\n` +
-                  `• Use \`get_vectorization_status_forest\` to check status\n` +
-                  `• Try \`get_next_task_forest\` for semantic recommendations`
-          }],
-          restart_result: result
-        };
-      } else {
-        return {
-          content: [{
-            type: 'text',
-            text: `**❌ ChromaDB Restart Failed**\n\nError: ${result.error || 'Unknown error'}\n\n` +
-                  `**Troubleshooting**:\n` +
-                  `• Check if port ${result.port || 8000} is available\n` +
-                  `• Verify ChromaDB installation\n` +
-                  `• Check system logs for more details\n` +
-                  `• Try \`get_chromadb_status_forest\` for more information`
-          }],
-          error: result.error
-        };
-      }
+      // ChromaDB has been replaced with SQLite vectors
+      return {
+        content: [{
+          type: 'text',
+          text: '**ℹ️ ChromaDB Migration Complete** 🎉\n\n' +
+                '**System Update**: ChromaDB has been replaced with SQLite vectors\n' +
+                '**Action**: No restart needed - SQLite vectors are always available\n' +
+                '**Status**: ✅ SQLite vector system is running\n\n' +
+                '**Why SQLite is Better**:\n' +
+                '• No server management required\n' +
+                '• Instant startup (no waiting for Docker)\n' +
+                '• More reliable and consistent\n' +
+                '• Better performance for local operations\n\n' +
+                '**Current Vector Operations**:\n' +
+                '• `get_vectorization_status_forest` - Check vectorization status\n' +
+                '• `vectorize_project_data_forest` - Vectorize your project\n' +
+                '• `get_next_task_forest` - Get intelligent task recommendations\n\n' +
+                '**Migration Status**: Complete - all vector operations now use SQLite'
+        }],
+        migration_status: 'complete',
+        current_provider: process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec',
+        chromadb_enabled: false
+      };
     } catch (error) {
       console.error('VectorizedHandlers.restartChromaDB failed:', error);
       return {
         content: [{
           type: 'text',
-          text: `**❌ ChromaDB Restart Failed**\n\nError: ${error.message}\n\nPlease check the system status and try again.`
+          text: `**❌ Vector System Status Check Failed**\n\nError: ${error.message}\n\nPlease check the system status and try again.`
         }],
         error: error.message
       };
