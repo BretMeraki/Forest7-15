@@ -1,5 +1,5 @@
 // LocalJSONProvider.js
-import { FileSystem } from '../../../modules/utils/file-system.js';
+import { FileSystem } from '../utils/file-system.js';
 import IVectorProvider from './IVectorProvider.js';
 
 /**

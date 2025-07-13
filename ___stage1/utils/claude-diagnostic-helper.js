@@ -6,7 +6,7 @@
  */
 
 import { DiagnosticVerifier } from './diagnostic-verifier.js';
-import { promises as fs } from 'fs';
+// fs is imported via require when needed
 import path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -32,7 +32,7 @@ export class ClaudeDiagnosticHelper {
             projectRoot = testPath;
             break;
           }
-        } catch (error) {
+        } catch (_) {
           // Continue to next path
         }
       }

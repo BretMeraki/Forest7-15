@@ -40,7 +40,9 @@ export class ForestLearningOrchestrator {
     }
     console.log(`Active project is '${activeProject.project_id}'. Proceeding with onboarding.`);
   }
-   * Stage 1 & 2: Capture top-level goal and gather initial context
+
+  /**
+   * Stage 1 and Stage 2: Capture top-level goal and gather initial context
    * @param {string} topLevelGoal - The primary goal for the session
    * @param {Object} initialContext - Initial context information
    * @returns {Object} Session initialization result

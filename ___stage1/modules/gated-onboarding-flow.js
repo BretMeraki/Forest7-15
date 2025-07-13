@@ -149,7 +149,7 @@ export class GatedOnboardingFlow {
         throw new Error('Onboarding state not found');
       }
 
-      if (!onboardingState.gates.goal_captured) {
+      if (!onboardingState.gates || !onboardingState.gates.goal_captured) {
         return {
           success: false,
           stage: 'context_gathering',
@@ -1264,6 +1264,108 @@ Format as structured JSON that incorporates the context snowball.`;
         risks: ['Unknown complexity'],
         accumulated_context_used: false
       };
+    }
+  }
+
+  /**
+   * Continue onboarding from a specific stage with user input
+   * This is the main method for progressing through the onboarding flow
+   */
+  async continueOnboarding(projectId, stage, inputData = {}) {
+    try {
+      let onboardingState = this.onboardingStates.get(projectId);
+      if (!onboardingState) {
+        // Initialize a basic onboarding state for testing or new sessions
+        onboardingState = {
+          projectId,
+          stage: stage || 'context_gathering',
+          capturedData: {},
+          contextSnowball: {
+            initial: {},
+            accumulated: {},
+            stage_insights: {},
+            evolution_history: []
+          },
+          startTime: new Date().toISOString()
+        };
+        this.onboardingStates.set(projectId, onboardingState);
+      }
+      if (!onboardingState.gates) {
+        onboardingState.gates = { goal_captured: true };
+      }
+
+      // Route to the appropriate stage handler
+      switch (stage || onboardingState.stage) {
+        case 'context_gathering':
+          return await this.gatherContext(projectId, inputData);
+        
+        case 'questionnaire':
+          if (inputData.response && inputData.question_id) {
+            return await this.processQuestionnaireResponse(projectId, inputData.question_id, inputData.response);
+          } else {
+            return await this.startDynamicQuestionnaire(projectId);
+          }
+        
+        case 'complexity_analysis':
+          return await this.performComplexityAnalysis(projectId);
+        
+        case 'hta_generation':
+        case 'tree_generation':
+          return await this.generateHTATree(projectId);
+        
+        case 'strategic_framework':
+        case 'framework_building':
+          return await this.buildStrategicFramework(projectId);
+        
+        default:
+          return {
+            success: false,
+            message: `Unknown stage: ${stage}`,
+            error: 'invalid_stage'
+          };
+      }
+    } catch (error) {
+      console.error('GatedOnboardingFlow.continueOnboarding failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        stage: stage
+      };
+    }
+  }
+
+  /**
+   * Determine the correct stage for an onboarding session
+   * Used for resuming onboarding or checking current status
+   */
+  async determineCorrectStage(projectId) {
+    try {
+      const onboardingState = this.onboardingStates.get(projectId);
+      
+      if (!onboardingState) {
+        // Check if onboarding was saved to disk
+        const savedState = await this.dataPersistence.loadProjectData(projectId, 'onboarding_state.json');
+        if (savedState) {
+          this.onboardingStates.set(projectId, savedState);
+          return savedState.stage || 'goal_capture';
+        }
+        return 'goal_capture'; // Default starting stage
+      }
+
+      // Determine stage based on gates
+      const gates = onboardingState.gates;
+      
+      if (!gates.goal_captured) return 'goal_capture';
+      if (!gates.context_gathered) return 'context_gathering';
+      if (!gates.questionnaire_complete) return 'questionnaire';
+      if (!gates.complexity_analyzed) return 'complexity_analysis';
+      if (!gates.tree_generated) return 'tree_generation';
+      if (!gates.framework_built) return 'framework_building';
+      
+      return 'complete';
+    } catch (error) {
+      console.error('Error determining correct stage:', error);
+      return 'goal_capture'; // Safe default
     }
   }
 }

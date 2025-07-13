@@ -8,11 +8,11 @@
 import { Server } from './local-mcp-server.js';
 import { StdioServerTransport } from './local-stdio-transport.js';
 import { EnhancedHTACore } from './modules/enhanced-hta-core.js';
-import { BackgroundProcessor } from '../modules/utils/background-processor.js';
-import HTAExpansionAgent from '../modules/utils/hta-expansion-agent.js';
+import { BackgroundProcessor } from './modules/utils/background-processor.js';
+import HTAExpansionAgent from './modules/utils/hta-expansion-agent.js';
 import { TaskStrategyCore } from './modules/task-strategy-core.js';
 import { CoreIntelligence } from './modules/core-intelligence.js';
-import { McpCore } from './modules/mcp-core.js';
+import { ConsolidatedMcpCore } from './modules/mcp-core-consolidated.js';
 import { DataPersistence } from './modules/data-persistence.js';
 import { ProjectManagement } from './modules/project-management.js';
 import { MemorySync } from './modules/memory-sync.js';
@@ -94,7 +94,7 @@ class Stage1CoreServer {
       },
     });
     this.memorySync = new MemorySync(this.dataPersistence);
-    this.mcpCore = new McpCore(this.server);
+    this.mcpCore = new ConsolidatedMcpCore(this.server);
     
     // Initialize diagnostic helper for preventing false positives
     // Ensure it uses the Forest server directory, not the Claude app directory
@@ -114,22 +114,7 @@ const __filename = fileURLToPath(import.meta.url);
     // Initialize Forest Data Vectorization FIRST for semantic operations
     this.forestDataVectorization = new ForestDataVectorization(this.dataPersistence.dataDir);
     
-    // Initialize ChromaDB Lifecycle Manager only if using ChromaDB as vector provider
-    const vectorProvider = process.env.FOREST_VECTOR_PROVIDER || 'sqlitevec';
-    if (vectorProvider === 'chroma') {
-      this.chromaDBLifecycle = new ChromaDBLifecycleManager({
-        dataDir: path.join(this.dataPersistence.dataDir, '.chromadb'),
-        host: process.env.CHROMA_HOST || '0.0.0.0',
-        port: parseInt(process.env.CHROMA_PORT) || 8000,
-        serverPath: 'python3',
-        serverScript: path.join(process.cwd(), 'start-chromadb-server.py'),
-        enableAutoRestart: process.env.CHROMA_AUTO_RESTART !== 'false',
-        maxRetries: parseInt(process.env.CHROMA_MAX_RETRIES) || 3,
-        startupTimeout: parseInt(process.env.CHROMA_STARTUP_TIMEOUT) || 30000
-      });
-    } else {
-      this.chromaDBLifecycle = null;
-    }
+    // ChromaDB support deprecated - using SQLite vector provider only
     
     // Initialize gated onboarding flow and Next + Pipeline presenter
     this.gatedOnboarding = new GatedOnboardingFlow(
@@ -159,7 +144,7 @@ const __filename = fileURLToPath(import.meta.url);
       this.forestDataVectorization,
       this.taskStrategyCore,
       this.projectManagement,
-      this.chromaDBLifecycle
+      null // ChromaDB deprecated
     );
     
     // Initialize diagnostic handlers
@@ -184,13 +169,7 @@ const __filename = fileURLToPath(import.meta.url);
     try {
       console.error('🚀 Initializing Stage1 Core Server...');
       
-      // Start ChromaDB in parallel (non-blocking) only if using ChromaDB
-      if (this.chromaDBLifecycle) {
-        console.error('🔄 Starting ChromaDB server in parallel...');
-        this.chromaDBLifecycle.startParallel().catch(error => {
-          console.error('⚠️ ChromaDB startup failed (non-blocking):', error.message);
-        });
-      }
+      // ChromaDB support deprecated - using SQLite vector provider only
       
       // Initialize core modules with vector support
 
@@ -219,21 +198,7 @@ const __filename = fileURLToPath(import.meta.url);
         console.error('⚠️ Forest Data Vectorization initialization failed:', vectorizationError.message);
       }
       
-      // Check ChromaDB status (non-blocking) only if using ChromaDB
-      if (this.chromaDBLifecycle) {
-        try {
-          const chromaStatus = this.chromaDBLifecycle.getStatus();
-          if (chromaStatus.isRunning) {
-            console.error('✅ ChromaDB server running', { port: chromaStatus.port, pid: chromaStatus.pid });
-          } else if (chromaStatus.isStarting) {
-            console.error('🔄 ChromaDB server starting...', { port: chromaStatus.port });
-          } else {
-            console.error('⚠️ ChromaDB server not available', chromaStatus);
-          }
-        } catch (chromaError) {
-          console.error('⚠️ ChromaDB status check failed:', chromaError.message);
-        }
-      }
+      // ChromaDB status checking removed - using SQLite vector provider only
       
       const htaCore = this.htaCore;
       if (htaCore && typeof htaCore.initializeVectorStore === 'function') {
@@ -422,6 +387,8 @@ const __filename = fileURLToPath(import.meta.url);
             case 'get_landing_page_forest':
               result = await this.generateLandingPage(); break;
             // Gated Onboarding Flow Tools
+            case 'start_gated_onboarding_forest':
+              result = await this.gatedOnboardingHandlers.startLearningJourney(args); break;
             case 'start_learning_journey_forest':
               result = await this.gatedOnboardingHandlers.startLearningJourney(args); break;
             case 'continue_onboarding_forest':
@@ -460,10 +427,7 @@ const __filename = fileURLToPath(import.meta.url);
               result = await this.diagnosticHandlers.getVectorStoreStatus(args); break;
             case 'optimize_vector_store_forest':
               result = await this.diagnosticHandlers.optimizeVectorStore(args); break;
-            case 'get_chromadb_status_forest':
-              result = await this.diagnosticHandlers.getChromaDBStatus(args); break;
-            case 'restart_chromadb_forest':
-              result = await this.diagnosticHandlers.restartChromaDB(args); break;
+            // ChromaDB tools removed - deprecated
             
             default:
               throw new Error(`Unknown tool: ${toolName}`);
@@ -867,8 +831,8 @@ const __filename = fileURLToPath(import.meta.url);
       // Placeholder response – in future this will be replaced by a real Claude call
       const assistantReply =
         rawPrompt
-          ? `I've generated an informed reply based on your latest progress.\n\n${claudeContextSnippet}`
-          : `I'm ready for your question whenever you are.\n\n${claudeContextSnippet}`;
+          ? `I have generated an informed reply based on your latest progress.\n\n${claudeContextSnippet}`
+          : `I am ready for your question whenever you are.\n\n${claudeContextSnippet}`;
 
       // Log hidden context for debugging when enabled
       if (process.env.DEBUG_CONTEXT === 'true') {
@@ -919,15 +883,7 @@ const __filename = fileURLToPath(import.meta.url);
         }
       }
 
-      // ChromaDB health check
-      let chromaDBHealthy = false;
-      let chromaDBStatus = null;
-      try {
-        chromaDBStatus = await this.chromaDBLifecycle.getHealthStatus();
-        chromaDBHealthy = chromaDBStatus.status === 'healthy';
-      } catch (error) {
-        chromaDBStatus = { status: 'error', reason: error.message };
-      }
+      // ChromaDB health check removed - using SQLite vector provider only
 
       const memory = process.memoryUsage();
 
@@ -939,8 +895,7 @@ const __filename = fileURLToPath(import.meta.url);
               status: 'ok',
               dataDirWritable,
               vectorStoreHealthy,
-              chromaDBHealthy,
-              chromaDBStatus,
+              // ChromaDB status removed
               memory,
               timestamp: new Date().toISOString(),
             },
@@ -1051,8 +1006,8 @@ const __filename = fileURLToPath(import.meta.url);
 Then provide exactly three main action sections:
 
 1. **START NEW PROJECT** - Guide for creating a new project
-2. **LOAD EXISTING PROJECT** - Options for continuing previous work ${userContext.hasExistingProjects ? `(User has ${userContext.projectCount} existing projects - SHOW THEM ALL IN ORGANIZED LIST)` : '(User has no existing projects yet)'}
-3. **LEARN ABOUT FOREST** - Invitation to ask about the suite's purpose and tools
+2. **LOAD EXISTING PROJECT** - Options for continuing previous work ${userContext.hasExistingProjects ? `(User has ${userContext.projectCount} existing projects - SHOW THEM ALL IN ORGANIZED LIST)` : `(User has no existing projects yet)`}
+3. **LEARN ABOUT FOREST** - Invitation to ask about the suite purpose and tools
 
 For each section, provide:
 - A clear action header
@@ -1098,7 +1053,7 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
     
     // Action 1: Start New Project
     content += `## 🚀 **START NEW PROJECT**\n\n`;
-    content += `Transform any ambitious goal into a clear, step-by-step journey. Whether you're learning a new skill, building something amazing, or solving a complex challenge - every great achievement starts with a single project.\n\n`;
+    content += `Transform any ambitious goal into a clear, step-by-step journey. Whether you are learning a new skill, building something amazing, or solving a complex challenge - every great achievement starts with a single project.\n\n`;
     content += `**Ready to begin?** Use: \`create_project_forest\`\n\n`;
     
     // Action 2: Load Existing Project
@@ -1136,13 +1091,13 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
       content += `**To switch projects, use the exact project ID shown above.**\n`;
       content += `Example: \`switch_project_forest {"project_id": "your_exact_project_id"}\`\n\n`;
     } else {
-      content += `No existing projects yet - but that's about to change! Your first project will be the foundation for achieving something extraordinary.\n\n`;
+      content += `No existing projects yet - but that is about to change! Your first project will be the foundation for achieving something extraordinary.\n\n`;
       content += `**Once you have projects:** Use \`list_projects_forest\` and \`switch_project_forest\`\n\n`;
     }
     
     // Action 3: Learn About Forest
     content += `## 🌲 **LEARN ABOUT FOREST**\n\n`;
-    content += `New to the Forest Suite? Curious about how it works? I'm here to guide you through everything - from the philosophy behind goal achievement to the practical tools that make it happen.\n\n`;
+    content += `New to the Forest Suite? Curious about how it works? I am here to guide you through everything - from the philosophy behind goal achievement to the practical tools that make it happen.\n\n`;
     content += `**Ask me anything:**\n`;
     content += `• "What does the Forest Suite do?"\n`;
     content += `• "How do the tools work together?"\n`;
@@ -1151,7 +1106,7 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
     
     // How it works section
     content += `---\n\n**How Forest Works:**\n\n`;
-    content += `The Forest Suite uses **Hierarchical Task Analysis (HTA)** to break down any complex goal into manageable, actionable tasks. Think of it as a GPS for your ambitions - it takes you from "I want to achieve X" to "Here's exactly what to do next."\n\n`;
+    content += `The Forest Suite uses **Hierarchical Task Analysis (HTA)** to break down any complex goal into manageable, actionable tasks. Think of it as a GPS for your ambitions - it takes you from "I want to achieve X" to "Here is exactly what to do next."\n\n`;
     content += `🎯 **Goal Clarity** → 🌳 **Task Breakdown** → 📋 **Next Actions** → 🏆 **Achievement**\n\n`;
     content += `Every tool in the suite works together to keep you moving forward, one meaningful step at a time.`;
     
@@ -1627,6 +1582,27 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
 
 
 
+  // Production readiness test methods - expose core functionality
+  async createProject(args) {
+    return await this.projectManagement.createProject(args);
+  }
+
+  async buildHTATree(args) {
+    return await this.buildHTATreeVectorized(args);
+  }
+
+  async getHTAStatus() {
+    return await this.htaCore.getHTAStatus();
+  }
+
+  async getVectorizationStatus() {
+    return await this.vectorizedHandlers.getVectorizationStatus({});
+  }
+
+  async getNextTask(args) {
+    return await this.taskStrategyCore.getNextTask(args);
+  }
+
   async cleanup() {
     try {
       this.logger.info?.('[Stage1CoreServer] Starting cleanup...');
@@ -1637,16 +1613,7 @@ Use engaging, inspiring language that matches the motto. Keep it concise but mot
         this.backgroundProcessor?.stop();
       } catch (_) { /* ignore */ }
 
-      // Gracefully shutdown ChromaDB server
-      try {
-        if (this.chromaDBLifecycle) {
-          console.error('🛑 Stopping ChromaDB server...');
-          await this.chromaDBLifecycle.stop();
-          console.error('✅ ChromaDB server stopped');
-        }
-      } catch (error) {
-        console.error('⚠️ ChromaDB shutdown failed:', error.message);
-      }
+      // ChromaDB shutdown removed - using SQLite vector provider only
 
       // Clear caches
       this.dataPersistence.clearCache();

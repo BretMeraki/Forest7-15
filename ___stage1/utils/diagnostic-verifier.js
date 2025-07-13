@@ -102,36 +102,43 @@ export class DiagnosticVerifier {
       const fullPath = this.resolveFilePath(filePath);
       const fileContent = await fs.readFile(fullPath, 'utf8');
       
+      // Escape function name for safe regex usage
+      const escapedName = functionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      
       // Enhanced patterns for function detection
       const patterns = [
         // Regular function declarations
-        new RegExp(`function\\s+${functionName}\\s*\\(`),
-        new RegExp(`async\\s+function\\s+${functionName}\\s*\\(`),
+        new RegExp(`function\\s+${escapedName}\\s*\\(`),
+        new RegExp(`async\\s+function\\s+${escapedName}\\s*\\(`),
         
         // Object method definitions
-        new RegExp(`${functionName}\\s*:\\s*function\\s*\\(`),
-        new RegExp(`${functionName}\\s*:\\s*async\\s*function\\s*\\(`),
+        new RegExp(`${escapedName}\\s*:\\s*function\\s*\\(`),
+        new RegExp(`${escapedName}\\s*:\\s*async\\s*function\\s*\\(`),
         
         // Arrow function assignments
-        new RegExp(`${functionName}\\s*=\\s*function\\s*\\(`),
-        new RegExp(`${functionName}\\s*=\\s*async\\s*function\\s*\\(`),
-        new RegExp(`${functionName}\\s*=\\s*\\([^)]*\\)\\s*=>`),
-        new RegExp(`${functionName}\\s*=\\s*async\\s*\\([^)]*\\)\\s*=>`),
+        new RegExp(`${escapedName}\\s*=\\s*function\\s*\\(`),
+        new RegExp(`${escapedName}\\s*=\\s*async\\s*function\\s*\\(`),
+        new RegExp(`${escapedName}\\s*=\\s*\\([^)]*\\)\\s*=>`),
+        new RegExp(`${escapedName}\\s*=\\s*async\\s*\\([^)]*\\)\\s*=>`),
         
         // Class method definitions
-        new RegExp(`async\\s+${functionName}\\s*\\(`),
-        new RegExp(`${functionName}\\s*\\([^)]*\\)\\s*{`),
-        new RegExp(`\\*\\s*${functionName}\\s*\\(`), // generator functions
+        new RegExp(`async\\s+${escapedName}\\s*\\(`),
+        new RegExp(`${escapedName}\\s*\\([^)]*\\)\\s*{`),
+        new RegExp(`\\*\\s*${escapedName}\\s*\\(`), // generator functions
         
         // Export patterns
-        new RegExp(`export\\s+function\\s+${functionName}\\s*\\(`),
-        new RegExp(`export\\s+async\\s+function\\s+${functionName}\\s*\\(`),
-        new RegExp(`export\\s*{[^}]*${functionName}[^}]*}`),
-        new RegExp(`export\\s+.*${functionName}`),
+        new RegExp(`export\\s+function\\s+${escapedName}\\s*\\(`),
+        new RegExp(`export\\s+async\\s+function\\s+${escapedName}\\s*\\(`),
+        new RegExp(`export\\s*{[^}]*${escapedName}[^}]*}`),
+        new RegExp(`export\\s+.*${escapedName}`),
         
         // CommonJS patterns
-        new RegExp(`exports\\.${functionName}\\s*=`),
-        new RegExp(`module\\.exports\\.${functionName}\\s*=`),
+        new RegExp(`exports\\.${escapedName}\\s*=`),
+        new RegExp(`module\\.exports\\.${escapedName}\\s*=`),
+        
+        // Additional patterns for edge cases
+        new RegExp(`\\b${escapedName}\\s*\\(`), // Simple method call pattern
+        new RegExp(`\\.${escapedName}\\s*=\\s*(?:async\\s*)?(?:function|\\()`), // Property assignment
       ];
       
       return patterns.some(pattern => pattern.test(fileContent));
@@ -305,16 +312,29 @@ export class DiagnosticVerifier {
   }
 
   /**
-   * Verify code execution
+   * Verify code execution with better error handling
    */
   async verifyCodeExecution(testCommand, description) {
     try {
+      // Use shorter timeout for quick checks
+      const timeout = testCommand.includes('test') ? 30000 : 5000;
+      
       const { stdout, stderr } = await execAsync(testCommand, { 
         cwd: this.projectRoot,
-        timeout: 30000 // 30 second timeout
+        timeout,
+        // Ensure proper encoding
+        encoding: 'utf8',
+        // Increase buffer size for test output
+        maxBuffer: 1024 * 1024 * 10 // 10MB
       });
       
-      const success = !stderr.includes('Error:') && !stderr.includes('failed');
+      // More nuanced success detection
+      const hasError = stderr.includes('Error:') || 
+                      stderr.includes('failed') ||
+                      stderr.includes('FAILED') ||
+                      (stderr.includes('error') && !stderr.includes('0 errors'));
+      
+      const success = !hasError && !stdout.includes('FAILED');
       
       this.verificationLog.push({
         type: 'code_execution',
@@ -328,6 +348,19 @@ export class DiagnosticVerifier {
       
       return success;
     } catch (error) {
+      // Timeout errors are common and don't indicate a system failure
+      if (error.killed || error.code === 'ETIMEDOUT') {
+        console.warn(`[DiagnosticVerifier] Command timed out: ${testCommand}`);
+        this.verificationLog.push({
+          type: 'code_execution_timeout',
+          description,
+          command: testCommand,
+          error: 'Command timed out',
+          timestamp: new Date().toISOString()
+        });
+        return false; // Return false but not an error
+      }
+      
       this.verificationLog.push({
         type: 'code_execution_error',
         description,

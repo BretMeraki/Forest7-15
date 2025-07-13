@@ -261,7 +261,45 @@ export const FOREST_TOOLS = {
     }
   },
 
-  // ========== ONBOARDING FLOW ==========
+  // ========== GATED ONBOARDING FLOW ==========
+  start_gated_onboarding_forest: {
+    name: 'start_gated_onboarding_forest',
+    description: 'Begin comprehensive gated onboarding process for optimal learning plan generation',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        goal: {
+          type: 'string',
+          description: '**REQUIRED** Your learning goal or what you want to achieve (e.g., "Master portrait photography and grow Instagram to 10k followers")'
+        },
+        user_context: {
+          type: 'object',
+          description: 'Optional: Initial context about your background, experience, constraints, etc.',
+          properties: {
+            experience: {
+              type: 'string',
+              description: 'Your current experience level (e.g., "beginner", "intermediate", "advanced")'
+            },
+            time_available: {
+              type: 'string',
+              description: 'How much time you can dedicate (e.g., "10 hours/week", "2 hours/day")'
+            },
+            background: {
+              type: 'string',
+              description: 'Relevant background or previous experience'
+            },
+            constraints: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Any constraints or limitations (time, budget, resources, etc.)'
+            }
+          }
+        }
+      },
+      required: ['goal']
+    }
+  },
+
   start_learning_journey_forest: {
     name: 'start_learning_journey_forest',
     description: 'Begin the guided onboarding process for new users. Provides step-by-step setup and goal collection.',
@@ -447,96 +485,7 @@ export const FOREST_TOOLS = {
     }
   },
 
-  // ========== GATED ONBOARDING & PIPELINE TOOLS ==========
-  start_learning_journey_forest: {
-    name: 'start_learning_journey_forest',
-    description: 'Begin comprehensive 6-stage gated onboarding process for optimal learning plan generation',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        goal: {
-          type: 'string',
-          description: '**REQUIRED** Your learning goal or what you want to achieve (e.g., "Master portrait photography and grow Instagram to 10k followers")'
-        },
-        user_context: {
-          type: 'object',
-          description: 'Optional: Initial context about your background, experience, constraints, etc.',
-          properties: {
-            experience: {
-              type: 'string',
-              description: 'Your current experience level (e.g., "beginner", "intermediate", "advanced")'
-            },
-            time_available: {
-              type: 'string',
-              description: 'How much time you can dedicate (e.g., "10 hours/week", "2 hours/day")'
-            },
-            background: {
-              type: 'string',
-              description: 'Relevant background or previous experience'
-            },
-            constraints: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Any constraints or limitations (time, budget, resources, etc.)'
-            }
-          }
-        }
-      },
-      required: ['goal']
-    }
-  },
-
-  continue_onboarding_forest: {
-    name: 'continue_onboarding_forest',
-    description: 'Continue through onboarding stages with quality gates',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        stage: {
-          type: 'string',
-          enum: ['context_gathering', 'questionnaire', 'complexity_analysis', 'hta_generation', 'strategic_framework'],
-          description: '**REQUIRED** Current onboarding stage to continue'
-        },
-        input_data: {
-          type: 'object',
-          description: 'Stage-specific input data (varies by stage)',
-          properties: {
-            action: {
-              type: 'string',
-              description: 'For questionnaire stage: "start" to begin questionnaire'
-            },
-            question_id: {
-              type: 'string',
-              description: 'For questionnaire stage: ID of question being answered'
-            },
-            response: {
-              type: 'string',
-              description: 'For questionnaire stage: Your response to the question'
-            }
-          }
-        },
-        project_id: {
-          type: 'string',
-          description: 'Optional: Project ID (uses active project if not provided)'
-        }
-      },
-      required: ['stage']
-    }
-  },
-
-  get_onboarding_status_forest: {
-    name: 'get_onboarding_status_forest',
-    description: 'Get current onboarding progress and next required actions',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        project_id: {
-          type: 'string',
-          description: 'Optional: Project ID (uses active project if not provided)'
-        }
-      }
-    }
-  },
+  // ========== PIPELINE TOOLS ==========
 
   get_next_pipeline_forest: {
     name: 'get_next_pipeline_forest',
@@ -600,80 +549,6 @@ export const FOREST_TOOLS = {
     }
   },
 
-  // ========== DIAGNOSTIC TOOLS ==========
-  verify_system_health_forest: {
-    name: 'verify_system_health_forest',
-    description: 'Verify overall system health to prevent false positive diagnostics. Runs comprehensive verification of system components.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        include_tests: {
-          type: 'boolean',
-          description: 'Optional: Include test suite verification (default: true)'
-        }
-      }
-    }
-  },
-
-  verify_function_exists_forest: {
-    name: 'verify_function_exists_forest',
-    description: 'Verify if a specific function exists before reporting it as missing. Prevents false positive function reports.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        function_name: {
-          type: 'string',
-          description: '**REQUIRED** Name of the function to verify'
-        },
-        file_path: {
-          type: 'string',
-          description: '**REQUIRED** Path to the file containing the function'
-        }
-      },
-      required: ['function_name', 'file_path']
-    }
-  },
-
-  run_diagnostic_verification_forest: {
-    name: 'run_diagnostic_verification_forest',
-    description: 'Run comprehensive diagnostic verification for reported issues. Analyzes and categorizes issues to identify false positives.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        reported_issues: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              type: {
-                type: 'string',
-                enum: ['function', 'import', 'export', 'system'],
-                description: 'Type of issue reported'
-              },
-              description: {
-                type: 'string',
-                description: 'Description of the issue'
-              },
-              functionName: {
-                type: 'string',
-                description: 'Function name (for function type issues)'
-              },
-              filePath: {
-                type: 'string',
-                description: 'File path (for function/import/export issues)'
-              },
-              itemName: {
-                type: 'string',
-                description: 'Item name (for import/export issues)'
-              }
-            },
-            required: ['type', 'description']
-          },
-          description: 'Optional: List of issues to verify (empty array runs general diagnostics)'
-        }
-      }
-    }
-  },
 
   get_health_status_forest: {
     name: 'get_health_status_forest',
@@ -940,7 +815,6 @@ export const FOREST_TOOLS = {
 // ========== DEPRECATED TOOLS TO REMOVE ==========
 export const DEPRECATED_TOOLS = [
   // Confusing multi-step onboarding components (replaced by comprehensive gated flow)
-  'start_gated_onboarding_forest',
   'submit_goal_forest',
   'submit_context_forest',
   'submit_questionnaire_forest',

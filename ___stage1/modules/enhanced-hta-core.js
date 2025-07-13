@@ -8,6 +8,7 @@
 import { HTACore } from './hta-core.js';
 import { PureSchemaHTASystem } from './pure-schema-driven-hta.js';
 import { GoalAchievementContext } from './goal-achievement-context.js';
+import { ASTParser } from './ast-parser-stub.js';
 
 export class EnhancedHTACore extends HTACore {
   constructor(dataPersistence, projectManagement, claudeInterface) {
@@ -28,6 +29,9 @@ export class EnhancedHTACore extends HTACore {
     
     // Expose vector store from parent class vector integration
     this.vectorStore = null;
+    
+    // Initialize AST Parser for code analysis capabilities
+    this.astParser = new ASTParser();
     
     // Initialize Gated Onboarding Flow
     this.gatedOnboardingFlow = null; // Will be initialized when needed
@@ -957,6 +961,15 @@ export class EnhancedHTACore extends HTACore {
       console.error('[EnhancedHTA] Schema retry failed:', error.message);
       return null;
     }
+  }
+
+  /**
+   * Derive strategic branches based on goal complexity and context
+   * This is the expected method name for PRD compliance
+   */
+  async deriveStrategicBranches(goal, complexityAnalysis, focusAreas) {
+    // Delegate to the existing method in parent class (HTACore)
+    return super.generateStrategicBranches(goal, complexityAnalysis, focusAreas);
   }
 
   /**

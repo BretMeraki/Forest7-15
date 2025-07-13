@@ -1,0 +1,114 @@
+{
+  "passed": 25,
+  "failed": 0,
+  "criticalErrors": [],
+  "warnings": [
+    "Forest data vectorization not available"
+  ],
+  "testDetails": [
+    {
+      "type": "success",
+      "message": "Core initialization"
+    },
+    {
+      "type": "success",
+      "message": "All required modules loaded"
+    },
+    {
+      "type": "success",
+      "message": "13 MCP tools registered"
+    },
+    {
+      "type": "success",
+      "message": "Transport layer ready"
+    },
+    {
+      "type": "success",
+      "message": "Data persistence working"
+    },
+    {
+      "type": "success",
+      "message": "Project management working (existing project handled)"
+    },
+    {
+      "type": "success",
+      "message": "HTA core initialized"
+    },
+    {
+      "type": "success",
+      "message": "Task strategy core with TaskSelector ready"
+    },
+    {
+      "type": "success",
+      "message": "Project switching works"
+    },
+    {
+      "type": "success",
+      "message": "HTA tree generated"
+    },
+    {
+      "type": "success",
+      "message": "HTA status retrieval works"
+    },
+    {
+      "type": "success",
+      "message": "6-Level HTA architecture available"
+    },
+    {
+      "type": "success",
+      "message": "Task selection works"
+    },
+    {
+      "type": "success",
+      "message": "Task completion processed"
+    },
+    {
+      "type": "success",
+      "message": "Strategy evolution works"
+    },
+    {
+      "type": "success",
+      "message": "Vector store ready (SQLiteVecProvider)"
+    },
+    {
+      "type": "warning",
+      "message": "Forest data vectorization not available"
+    },
+    {
+      "type": "success",
+      "message": "Ambiguous desires manager available"
+    },
+    {
+      "type": "success",
+      "message": "Clarification dialogue system ready"
+    },
+    {
+      "type": "success",
+      "message": "All critical MCP tools available"
+    },
+    {
+      "type": "success",
+      "message": "MCP response format correct"
+    },
+    {
+      "type": "success",
+      "message": "Memory usage OK: 29MB"
+    },
+    {
+      "type": "success",
+      "message": "Fast response time: 36ms"
+    },
+    {
+      "type": "success",
+      "message": "Console output properly routed"
+    },
+    {
+      "type": "success",
+      "message": "Error handling works correctly"
+    },
+    {
+      "type": "success",
+      "message": "MCP protocol compliance verified"
+    }
+  ]
+}

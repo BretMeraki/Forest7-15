@@ -10,15 +10,29 @@ import {
   ListPromptsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-import { 
-  FOREST_TOOLS, 
-  getToolList, 
+import {
+  CORE_FOREST_TOOLS,
+  getCoreToolList,
+  isCoretool
+} from './core-tool-definitions.js';
+
+// Fallback to full tool set if needed for internal operations
+import {
+  FOREST_TOOLS,
+  getToolList,
   isDeprecatedTool,
-  DEPRECATED_TOOLS 
+  DEPRECATED_TOOLS
 } from './consolidated-tool-definitions.js';
 
 import { DeprecatedToolRedirects } from './deprecated-tool-redirects.js';
-import { debugLogger } from '../../modules/utils/debug-logger.js';
+import { logger } from './utils/logger.js';
+
+// Create debugLogger interface that matches expected usage
+const debugLogger = {
+  logEvent: (event, data) => {
+    logger.debug(`[${event}]`, data);
+  }
+};
 
 export class ConsolidatedMcpCore {
   constructor(server) {
@@ -29,10 +43,10 @@ export class ConsolidatedMcpCore {
   async setupHandlers() {
     console.error('[ConsolidatedMCP] Setting up handlers...');
 
-    // List tools handler - only show non-deprecated tools
+    // List tools handler - only show core tools for Claude
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      const tools = getToolList();
-      console.error(`[ConsolidatedMCP] Returning ${tools.length} active tools`);
+      const tools = getCoreToolList();
+      console.error(`[ConsolidatedMCP] Returning ${tools.length} core tools for Claude`);
       return { tools };
     });
 
@@ -47,15 +61,19 @@ export class ConsolidatedMcpCore {
           return DeprecatedToolRedirects.handleDeprecatedOnboardingTool(name, args || {});
         }
 
-        // Check if tool exists in our consolidated set
-        if (!FOREST_TOOLS[name]) {
+        // Check if tool exists in core tools (what Claude sees) or full tools (internal)
+        const coreTools = getCoreToolList();
+        const isCoreTool = coreTools.some(t => t.name === name);
+        const isFullTool = FOREST_TOOLS[name];
+        
+        if (!isCoreTool && !isFullTool) {
           console.error(`[ConsolidatedMCP] Unknown tool: ${name}`);
           return {
             content: [{
               type: 'text',
               text: `# Unknown Tool: ${name}
 
-This tool doesn't exist in Forest Suite. 
+This tool doesn't exist in Forest Suite.
 
 **Available tools:**
 ${this.formatAvailableTools()}
@@ -188,10 +206,10 @@ ${err.message}
   }
 
   /**
-   * Get clean tool definitions without deprecated ones
+   * Get core tool definitions for Claude
    */
   getToolDefinitions() {
-    return getToolList();
+    return getCoreToolList();
   }
 
   /**

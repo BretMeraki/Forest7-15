@@ -129,15 +129,12 @@ class McpCore {
     console.error('[McpCore] Tool router connected');
   }
 
-  async getToolDefinitions() {
-    // Return tool definitions from consolidated definitions as an array
+  getToolDefinitions() {
+    // Return tool definitions synchronously from cached definitions
     try {
-      const { FOREST_TOOLS } = await import('./consolidated-tool-definitions.js');
-      if (FOREST_TOOLS && typeof FOREST_TOOLS === 'object') {
-        // Convert object to array of tool definitions
-        return Object.values(FOREST_TOOLS);
-      }
-      return [];
+      // Use the synchronous getToolList() method
+      const tools = getToolList();
+      return tools || [];
     } catch (error) {
       console.error('[McpCore] Failed to load tool definitions:', error.message);
       return [];

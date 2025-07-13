@@ -1,23 +1,14 @@
 {
   "mcpServers": {
-    "filesystem": {
-      "command": "npx",
+    "serena": {
+      "command": "python",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "C:\\Users\\schlansk\\.forest-data"
-      ]
-    },
-    "forest": {
-      "command": "node",
-      "args": [
-        "C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\forest-mcp-server.js"
+        "C:\\Users\\schlansk\\Downloads\\serena\\scripts\\mcp_server.py"
       ],
-      "cwd": "C:\\Users\\schlansk\\Downloads\\7-3forest-main",
+      "cwd": "C:\\Users\\schlansk\\Downloads\\serena",
       "env": {
-        "FOREST_DATA_DIR": "C:\\Users\\schlansk\\.forest-data",
-        "FOREST_VECTOR_PROVIDER": "sqlitevec"
+        "PYTHONPATH": "C:\\Users\\schlansk\\Downloads\\serena\\src"
       }
     }
   }
-}
+} 

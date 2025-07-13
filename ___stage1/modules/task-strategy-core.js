@@ -8,7 +8,7 @@ import { TaskGeneratorEvolution } from './task-generator-evolution.js';
 import { TaskBatchOptimizer } from './task-batch-optimizer.js';
 import { HTAVectorStore } from './hta-vector-store.js';
 import { GoalAchievementContext } from './goal-achievement-context.js';
-import { TaskSelector } from '../../modules/task-logic/task-selector.js';
+import { TaskSelector } from './task-logic/task-selector.js';
 import { TaskFormatter } from './task-formatter.js';
 import { FILE_NAMES } from './memory-sync.js';
 import { guard } from '../utils/hta-guard.js';
@@ -29,6 +29,7 @@ export class TaskStrategyCore {
     this.goalFocusedSelector = new GoalFocusedTaskSelector(dataPersistence);
     this.taskGenerator = new TaskGeneratorEvolution(dataPersistence, projectManagement, this.llmInterface, eventBus);
     this.batchOptimizer = new TaskBatchOptimizer();
+    this.taskSelector = new TaskSelector(dataPersistence);
     
     // Initialize vector store and goal context
     this.vectorStore = new HTAVectorStore();
@@ -326,14 +327,15 @@ export class TaskStrategyCore {
     
     // Fallback to traditional selection if vector failed
     if (!selectedTask) {
-      selectedTask = TaskSelector.selectOptimalTask(
+      selectedTask = await this.taskSelector.selectOptimalTask(
+        projectId,
         htaData,
-        energyLevel,
-        timeAvailable,
-        contextFromMemory,
-        config,
-        config,
-        null // reasoningAnalysis skipped for Stage1
+        {
+          energyLevel,
+          timeAvailable,
+          contextFromMemory,
+          config
+        }
       );
       
       if (selectedTask) {

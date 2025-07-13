@@ -4,7 +4,7 @@
  */
 
 import { McpCore } from './modules/mcp-core.js';
-import { logger } from '../modules/utils/logger.js';
+import { logger } from './modules/utils/logger.js';
 
 export class CoreHandlers {
   constructor(server) {

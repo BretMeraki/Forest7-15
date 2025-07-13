@@ -18,7 +18,12 @@ jest.unstable_mockModule('../hta-validator.js', () => ({
 }));
 
 // Import after mocking
-const { guard } = await import('../hta-guard.js');
+let guard;
+
+beforeAll(async () => {
+  const module = await import('../hta-guard.js');
+  guard = module.guard;
+});
 
 describe('HTA Guard', () => {
   beforeEach(async () => {
