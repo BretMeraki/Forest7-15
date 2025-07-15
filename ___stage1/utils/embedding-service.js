@@ -12,7 +12,8 @@ const EMBEDDING_CACHE_DIR = vectorConfig.embedding.cacheDir || '.embedding-cache
 
 class EmbeddingService {
   constructor() {
-    this.provider = 'deterministic';
+    this.provider = process.env.EMBEDDING_PROVIDER || 'deterministic';
+    this.model = process.env.EMBEDDING_MODEL || 'text-embedding-ada-002';
     this.cacheDir = EMBEDDING_CACHE_DIR;
     this.cache = new Map();
     
@@ -116,45 +117,8 @@ class EmbeddingService {
   }
 
   async embedText(text, dimension = 1536) {
-    if (!text) return new Array(dimension).fill(0);
-    const key = this._hash(`${this.model}:${text}`);
-    const cacheFile = this._getCachePath(text);
-    if (fs.existsSync(cacheFile)) {
-      try {
-        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-        if (Array.isArray(cached) && cached.length === dimension) return cached;
-      } catch (_) {}
-    }
-
-    let vector;
-
-    if (this.provider === 'openai' && process.env.OPENAI_API_KEY) {
-      try {
-        const res = await fetch(OPENAI_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            input: text,
-            model: this.model,
-          }),
-        });
-        const data = await res.json();
-        vector = data?.data?.[0]?.embedding;
-      } catch (err) {
-        console.error('[Embedding] OpenAI request failed, falling back to deterministic embedding:', err?.message || err);
-      }
-    }
-
-    if (!vector) {
-      // Deterministic fallback: simple hashed vector
-      vector = this._deterministicVector(text, dimension);
-    }
-
-    fs.writeFileSync(cacheFile, JSON.stringify(vector));
-    return vector;
+    // Use the main embed method for consistency
+    return await this.embed(text);
   }
 
   _deterministicVector(text, dimension) {

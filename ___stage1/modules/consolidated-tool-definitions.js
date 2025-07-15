@@ -237,31 +237,46 @@ export const FOREST_TOOLS = {
     }
   },
 
-  ask_truthful_claude_forest: {
-    name: 'ask_truthful_claude_forest',
-    description: 'Query truthful Claude with structured prompts and context. REQUIRED: prompt parameter.',
+
+  // ========== GATED ONBOARDING FLOW ==========
+  start_gated_onboarding_forest: {
+    name: 'start_gated_onboarding_forest',
+    description: 'Begin comprehensive gated onboarding process for optimal learning plan generation',
     inputSchema: {
       type: 'object',
       properties: {
-        prompt: {
+        goal: {
           type: 'string',
-          description: '**REQUIRED** Your question or request for Claude'
+          description: '**REQUIRED** Your learning goal or what you want to achieve (e.g., "Master portrait photography and grow Instagram to 10k followers")'
         },
-        context: {
+        user_context: {
           type: 'object',
-          description: 'Optional: Additional context for the query'
-        },
-        response_format: {
-          type: 'string',
-          enum: ['text', 'json', 'markdown'],
-          description: 'Optional: Desired response format (default: text)'
+          description: 'Optional: Initial context about your background, experience, constraints, etc.',
+          properties: {
+            experience: {
+              type: 'string',
+              description: 'Your current experience level (e.g., "beginner", "intermediate", "advanced")'
+            },
+            time_available: {
+              type: 'string',
+              description: 'How much time you can dedicate (e.g., "10 hours/week", "2 hours/day")'
+            },
+            background: {
+              type: 'string',
+              description: 'Relevant background or previous experience'
+            },
+            constraints: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Any constraints or limitations (time, budget, resources, etc.)'
+            }
+          }
         }
       },
-      required: ['prompt']
+      required: ['goal']
     }
   },
 
-  // ========== ONBOARDING FLOW ==========
   start_learning_journey_forest: {
     name: 'start_learning_journey_forest',
     description: 'Begin the guided onboarding process for new users. Provides step-by-step setup and goal collection.',
@@ -447,96 +462,7 @@ export const FOREST_TOOLS = {
     }
   },
 
-  // ========== GATED ONBOARDING & PIPELINE TOOLS ==========
-  start_learning_journey_forest: {
-    name: 'start_learning_journey_forest',
-    description: 'Begin comprehensive 6-stage gated onboarding process for optimal learning plan generation',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        goal: {
-          type: 'string',
-          description: '**REQUIRED** Your learning goal or what you want to achieve (e.g., "Master portrait photography and grow Instagram to 10k followers")'
-        },
-        user_context: {
-          type: 'object',
-          description: 'Optional: Initial context about your background, experience, constraints, etc.',
-          properties: {
-            experience: {
-              type: 'string',
-              description: 'Your current experience level (e.g., "beginner", "intermediate", "advanced")'
-            },
-            time_available: {
-              type: 'string',
-              description: 'How much time you can dedicate (e.g., "10 hours/week", "2 hours/day")'
-            },
-            background: {
-              type: 'string',
-              description: 'Relevant background or previous experience'
-            },
-            constraints: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Any constraints or limitations (time, budget, resources, etc.)'
-            }
-          }
-        }
-      },
-      required: ['goal']
-    }
-  },
-
-  continue_onboarding_forest: {
-    name: 'continue_onboarding_forest',
-    description: 'Continue through onboarding stages with quality gates',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        stage: {
-          type: 'string',
-          enum: ['context_gathering', 'questionnaire', 'complexity_analysis', 'hta_generation', 'strategic_framework'],
-          description: '**REQUIRED** Current onboarding stage to continue'
-        },
-        input_data: {
-          type: 'object',
-          description: 'Stage-specific input data (varies by stage)',
-          properties: {
-            action: {
-              type: 'string',
-              description: 'For questionnaire stage: "start" to begin questionnaire'
-            },
-            question_id: {
-              type: 'string',
-              description: 'For questionnaire stage: ID of question being answered'
-            },
-            response: {
-              type: 'string',
-              description: 'For questionnaire stage: Your response to the question'
-            }
-          }
-        },
-        project_id: {
-          type: 'string',
-          description: 'Optional: Project ID (uses active project if not provided)'
-        }
-      },
-      required: ['stage']
-    }
-  },
-
-  get_onboarding_status_forest: {
-    name: 'get_onboarding_status_forest',
-    description: 'Get current onboarding progress and next required actions',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        project_id: {
-          type: 'string',
-          description: 'Optional: Project ID (uses active project if not provided)'
-        }
-      }
-    }
-  },
+  // ========== PIPELINE TOOLS ==========
 
   get_next_pipeline_forest: {
     name: 'get_next_pipeline_forest',
@@ -600,84 +526,46 @@ export const FOREST_TOOLS = {
     }
   },
 
-  // ========== DIAGNOSTIC TOOLS ==========
-  verify_system_health_forest: {
-    name: 'verify_system_health_forest',
-    description: 'Verify overall system health to prevent false positive diagnostics. Runs comprehensive verification of system components.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        include_tests: {
-          type: 'boolean',
-          description: 'Optional: Include test suite verification (default: true)'
-        }
-      }
-    }
-  },
-
-  verify_function_exists_forest: {
-    name: 'verify_function_exists_forest',
-    description: 'Verify if a specific function exists before reporting it as missing. Prevents false positive function reports.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        function_name: {
-          type: 'string',
-          description: '**REQUIRED** Name of the function to verify'
-        },
-        file_path: {
-          type: 'string',
-          description: '**REQUIRED** Path to the file containing the function'
-        }
-      },
-      required: ['function_name', 'file_path']
-    }
-  },
-
-  run_diagnostic_verification_forest: {
-    name: 'run_diagnostic_verification_forest',
-    description: 'Run comprehensive diagnostic verification for reported issues. Analyzes and categorizes issues to identify false positives.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        reported_issues: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              type: {
-                type: 'string',
-                enum: ['function', 'import', 'export', 'system'],
-                description: 'Type of issue reported'
-              },
-              description: {
-                type: 'string',
-                description: 'Description of the issue'
-              },
-              functionName: {
-                type: 'string',
-                description: 'Function name (for function type issues)'
-              },
-              filePath: {
-                type: 'string',
-                description: 'File path (for function/import/export issues)'
-              },
-              itemName: {
-                type: 'string',
-                description: 'Item name (for import/export issues)'
-              }
-            },
-            required: ['type', 'description']
-          },
-          description: 'Optional: List of issues to verify (empty array runs general diagnostics)'
-        }
-      }
-    }
-  },
 
   get_health_status_forest: {
     name: 'get_health_status_forest',
-    description: 'Get comprehensive system health status including data directory, memory usage, and component status',
+    description: 'Get comprehensive system health status including data directory, SQLite vector store, memory usage, and component status',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  get_vector_store_status_forest: {
+    name: 'get_vector_store_status_forest',
+    description: 'Get detailed SQLite vector store status including connection, statistics, and cache performance',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  optimize_vector_store_forest: {
+    name: 'optimize_vector_store_forest',
+    description: 'Optimize SQLite vector store by performing WAL checkpoint and database maintenance',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  get_chromadb_status_forest: {
+    name: 'get_chromadb_status_forest',
+    description: 'Legacy ChromaDB command - provides migration information about SQLite vector store transition',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
+  },
+
+  restart_chromadb_forest: {
+    name: 'restart_chromadb_forest',
+    description: 'Legacy ChromaDB command - provides migration information about SQLite vector store benefits',
     inputSchema: {
       type: 'object',
       properties: {}
@@ -897,6 +785,116 @@ export const FOREST_TOOLS = {
         }
       }
     }
+  },
+
+  // ========== CODE ANALYSIS TOOLS ==========
+  analyze_code_ast_forest: {
+    name: 'analyze_code_ast_forest',
+    description: 'Provide detailed AST analysis of Forest code for Claude to understand structure and identify improvement opportunities. Always enabled for full codebase visibility.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_paths: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of file paths to analyze (relative to Forest root directory). If omitted, analyzes entire codebase when full visibility is enabled.'
+        },
+        analysis_type: {
+          type: 'string',
+          enum: ['structure', 'complexity', 'patterns', 'task_generation', 'summary'],
+          default: 'structure',
+          description: 'Type of analysis to perform'
+        },
+        focus_area: {
+          type: 'string',
+          description: 'Optional: Specific area to focus analysis on (e.g., "task generation", "generic patterns")'
+        }
+      },
+      required: []
+    }
+  },
+
+  // ========== READ-ONLY FILESYSTEM TOOLS ==========
+  read_file_forest: {
+    name: 'read_file_forest',
+    description: 'Read file contents safely with read-only access. Claude can view code but cannot modify it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_path: {
+          type: 'string',
+          description: 'Path to the file to read (relative to project root)'
+        }
+      },
+      required: ['file_path']
+    }
+  },
+
+  list_files_forest: {
+    name: 'list_files_forest',
+    description: 'List files and directories with read-only access. Shows file structure without write permissions.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        directory_path: {
+          type: 'string',
+          description: 'Directory path to list (relative to project root). Leave empty for root directory.',
+          default: ''
+        }
+      },
+      required: []
+    }
+  },
+
+  search_files_forest: {
+    name: 'search_files_forest',
+    description: 'Search for files matching a pattern with read-only access.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pattern: {
+          type: 'string',
+          description: 'Search pattern to match against filenames'
+        },
+        search_path: {
+          type: 'string',
+          description: 'Directory to search within (relative to project root)',
+          default: ''
+        }
+      },
+      required: ['pattern']
+    }
+  },
+
+  get_file_info_forest: {
+    name: 'get_file_info_forest',
+    description: 'Get file metadata and information without reading content.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_path: {
+          type: 'string',
+          description: 'Path to the file to get info for (relative to project root)'
+        }
+      },
+      required: ['file_path']
+    }
+  },
+
+  read_multiple_files_forest: {
+    name: 'read_multiple_files_forest',
+    description: 'Read multiple files efficiently with read-only access.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_paths: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of file paths to read (relative to project root, max 50 files)'
+        }
+      },
+      required: ['file_paths']
+    }
   }
 
 };
@@ -904,7 +902,6 @@ export const FOREST_TOOLS = {
 // ========== DEPRECATED TOOLS TO REMOVE ==========
 export const DEPRECATED_TOOLS = [
   // Confusing multi-step onboarding components (replaced by comprehensive gated flow)
-  'start_gated_onboarding_forest',
   'submit_goal_forest',
   'submit_context_forest',
   'submit_questionnaire_forest',
@@ -944,8 +941,7 @@ export const TOOL_CATEGORIES = {
     'generate_daily_schedule_forest'
   ],
   'Advanced Features': [
-    'sync_forest_memory_forest',
-    'ask_truthful_claude_forest'
+    'sync_forest_memory_forest'
   ],
   'System Management': [
     'factory_reset_forest',
@@ -960,9 +956,15 @@ export const TOOL_CATEGORIES = {
     'debug_cache_forest',
     'emergency_clear_cache_forest'
   ],
-  'Vectorization Tools': [
+  'Vector Store Management': [
     'get_vectorization_status_forest',
-    'vectorize_project_data_forest'
+    'vectorize_project_data_forest',
+    'get_vector_store_status_forest',
+    'optimize_vector_store_forest'
+  ],
+  'Legacy Tools': [
+    'get_chromadb_status_forest',
+    'restart_chromadb_forest'
   ],
   'Ambiguous Desires': [
     'assess_goal_clarity_forest',
@@ -972,6 +974,16 @@ export const TOOL_CATEGORIES = {
     'smart_evolution_forest',
     'adaptive_evolution_forest',
     'get_ambiguous_desire_status_forest'
+  ],
+  'Code Analysis': [
+    'analyze_code_ast_forest'
+  ],
+  'Read-Only Filesystem': [
+    'read_file_forest',
+    'list_files_forest',
+    'search_files_forest',
+    'get_file_info_forest',
+    'read_multiple_files_forest'
   ]
 };
 

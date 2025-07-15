@@ -14,6 +14,9 @@ process.stderr.on('error', (err) => {
 // Enhanced logging: write to stderr AND dedicated log file
 const logDir = process.env.FOREST_DATA_DIR || path.resolve('.', '.forest-data');
 const logFile = path.join(logDir, 'forest-mcp.log');
+
+// Read-only flag for stage1 operations
+const STAGE1_READ_ONLY = process.env.STAGE1_READ_ONLY === 'true' || false;
 try {
   fs.mkdirSync(logDir, { recursive: true });
 } catch (_) { /* ignore */ }
@@ -46,7 +49,7 @@ async function main() {
   try {
     logError('Starting Forest MCP server initialization...');
     
-    coreInitInstance = new CoreInitialization();
+    coreInitInstance = new CoreInitialization({ readOnly: STAGE1_READ_ONLY });
     await coreInitInstance.initialize();
     
     const server = coreInitInstance.server;

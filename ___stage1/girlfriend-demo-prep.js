@@ -72,7 +72,7 @@ class DemoPrep {
       }
       
       // Check MCP tools
-      const tools = this.coreInit.server.mcpCore.getToolDefinitions();
+      const tools = this.coreInit.server.mcpCore.getToolDefinitions() || [];
       const requiredTools = [
         'create_project_forest',
         'build_hta_tree_forest', 

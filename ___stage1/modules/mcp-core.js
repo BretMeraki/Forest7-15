@@ -30,7 +30,6 @@ class McpCore {
       'current_status_forest',
       'generate_daily_schedule_forest',
       'sync_forest_memory_forest',
-      'ask_truthful_claude_forest',
       
       // System Management
       'factory_reset_forest',
@@ -75,9 +74,17 @@ class McpCore {
   current_status_forest() { return this.callHandler('current_status_forest', arguments); }
   generate_daily_schedule_forest() { return this.callHandler('generate_daily_schedule_forest', arguments); }
   sync_forest_memory_forest() { return this.callHandler('sync_forest_memory_forest', arguments); }
-  ask_truthful_claude_forest() { return this.callHandler('ask_truthful_claude_forest', arguments); }
   factory_reset_forest() { return this.callHandler('factory_reset_forest', arguments); }
   get_current_config() { return this.callHandler('get_current_config', arguments); }
+  get_landing_page_forest() { return this.callHandler('get_landing_page_forest', arguments); }
+
+  // ===== GATED ONBOARDING \u0026 PIPELINE TOOLS =====
+  start_learning_journey_forest() { return this.callHandler('start_learning_journey_forest', arguments); }
+  continue_onboarding_forest() { return this.callHandler('continue_onboarding_forest', arguments); }
+  get_onboarding_status_forest() { return this.callHandler('get_onboarding_status_forest', arguments); }
+  complete_onboarding_forest() { return this.callHandler('complete_onboarding_forest', arguments); }
+  get_next_pipeline_forest() { return this.callHandler('get_next_pipeline_forest', arguments); }
+  evolve_pipeline_forest() { return this.callHandler('evolve_pipeline_forest', arguments); }
 
   // ===== AMBIGUOUS DESIRES TOOLS =====
   assess_goal_clarity_forest() { 
@@ -129,15 +136,12 @@ class McpCore {
     console.error('[McpCore] Tool router connected');
   }
 
-  async getToolDefinitions() {
-    // Return tool definitions from consolidated definitions as an array
+  getToolDefinitions() {
+    // Return tool definitions synchronously from cached definitions
     try {
-      const { FOREST_TOOLS } = await import('./consolidated-tool-definitions.js');
-      if (FOREST_TOOLS && typeof FOREST_TOOLS === 'object') {
-        // Convert object to array of tool definitions
-        return Object.values(FOREST_TOOLS);
-      }
-      return [];
+      // Use the synchronous getToolList() method
+      const tools = getToolList();
+      return tools || [];
     } catch (error) {
       console.error('[McpCore] Failed to load tool definitions:', error.message);
       return [];

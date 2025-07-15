@@ -1,6 +1,50 @@
 /**
  * Error classes for Forest MCP Stage1 Architecture
+ * Enhanced with error tracking and false positive prevention
  */
+
+// Global error tracking for pattern analysis
+const errorHistory = [];
+const MAX_ERROR_HISTORY = 100;
+
+/**
+ * Track error patterns to identify false positives
+ */
+function trackError(error) {
+  errorHistory.push({
+    timestamp: Date.now(),
+    type: error.constructor.name,
+    code: error.code,
+    message: error.message,
+    stack: error.stack
+  });
+  
+  // Maintain reasonable history size
+  if (errorHistory.length > MAX_ERROR_HISTORY) {
+    errorHistory.shift();
+  }
+}
+
+/**
+ * Analyze error patterns for false positives
+ */
+export function analyzeErrorPatterns() {
+  const patterns = {};
+  const recentErrors = errorHistory.filter(e => Date.now() - e.timestamp < 300000); // Last 5 minutes
+  
+  recentErrors.forEach(error => {
+    const key = `${error.type}:${error.code}`;
+    patterns[key] = (patterns[key] || 0) + 1;
+  });
+  
+  return {
+    totalErrors: recentErrors.length,
+    patterns,
+    possibleFalsePositives: Object.entries(patterns)
+      .filter(([_, count]) => count > 5)
+      .map(([pattern]) => pattern)
+  };
+}
 
 export class ForestError extends Error {
   constructor(message, code, metadata = {}) {
@@ -9,6 +53,9 @@ export class ForestError extends Error {
     this.code = code;
     this.metadata = metadata;
     this.timestamp = new Date().toISOString();
+    
+    // Track this error for pattern analysis
+    trackError(this);
   }
 }
 

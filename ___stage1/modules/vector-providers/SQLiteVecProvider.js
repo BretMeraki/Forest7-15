@@ -1,7 +1,22 @@
 // SQLiteVecProvider.js
-import sqlite3 from 'sqlite3';
-import { promises as fs } from 'fs';
+// Production SQLite implementation
+import { fileURLToPath } from 'url';
 import path from 'path';
+import { createRequire } from 'module';
+import { promises as fs } from 'fs';
+
+// Dynamic import handling for SQLite
+let sqlite3;
+try {
+    // Try to load sqlite3 if available
+    const require = createRequire(import.meta.url);
+    sqlite3 = require('sqlite3').verbose();
+} catch (error) {
+    // Fallback to mock implementation for environments without sqlite3
+    const MockSQLite = await import('../mock-sqlite.js');
+    sqlite3 = MockSQLite.default;
+    console.warn('[SQLiteVecProvider] Using mock SQLite implementation - install sqlite3 for production use');
+}
 import IVectorProvider from './IVectorProvider.js';
 
 /**

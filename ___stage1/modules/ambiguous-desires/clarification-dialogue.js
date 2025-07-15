@@ -4,6 +4,8 @@
  */
 
 import { FILE_NAMES, DEFAULT_PATHS } from '../memory-sync.js';
+import { extractProjectId, validateCommonArgs } from '../../utils/parameter-validator.js';
+// Import removed - we'll use the main DataPersistence system instead
 
 const CLARIFICATION_CONSTANTS = {
   MIN_RESPONSES_FOR_CONVERGENCE: 3,
@@ -21,15 +23,22 @@ export class ClarificationDialogue {
     this.projectManagement = projectManagement;
     this.vectorStore = vectorStore;
     this.activeDialogues = new Map(); // Track ongoing clarification sessions
+    // Use the main DataPersistence system instead of separate SQLite system
   }
 
   /**
    * Start a clarification dialogue for ambiguous goals
    */
   async startClarificationDialogue(args) {
-    const ambiguousGoal = args.ambiguous_goal || args.goal || '';
-    const initialContext = args.context || '';
-    const projectId = args.project_id || null;
+    // Validate and extract parameters
+    const params = validateCommonArgs(args, {
+      requireGoal: false,
+      methodName: 'startClarificationDialogue'
+    });
+    
+    const ambiguousGoal = params.goal || args.ambiguous_goal || '';
+    const initialContext = params.context || '';
+    const projectId = extractProjectId(args, 'startClarificationDialogue');
 
     try {
       let activeProjectId = projectId;
@@ -67,8 +76,8 @@ export class ClarificationDialogue {
       // Generate first clarification question
       const firstQuestion = this.generateClarificationQuestion(session, ambiguityAnalysis);
 
-      // Store session data
-      await this.saveDialogueSession(activeProjectId, session);
+      // Store session data using DataPersistence
+      await this._saveDialogueSession(session);
 
       return {
         success: true,
@@ -105,25 +114,62 @@ export class ClarificationDialogue {
    * Continue clarification dialogue with user response
    */
   async continueDialogue(args) {
-    const dialogueId = args.dialogue_id;
+let dialogueId = args.dialogue_id;
+    if (!dialogueId) {
+      console.error('Dialogue ID not provided, attempting to find most recent active dialogue');
+      
+      // Get current project ID for scoped lookup
+      let currentProjectId = null;
+      try {
+        const activeProject = await this.projectManagement.getActiveProject();
+        currentProjectId = activeProject?.project_id;
+      } catch (error) {
+        console.error('Could not get active project for dialogue lookup:', error.message);
+      }
+      
+      // First try to get most recent from persistent storage
+      try {
+        const activeDialogues = await this._getActiveDialogues(currentProjectId);
+        if (activeDialogues.length > 0) {
+          // Sort by startedAt DESC and get most recent
+          const sortedDialogues = activeDialogues.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+          dialogueId = sortedDialogues[0].id;
+          console.error(`Found most recent active dialogue from storage: ${dialogueId} (goal: "${sortedDialogues[0].originalGoal}")`);
+        } else {
+          console.error('No active dialogues found in storage');
+        }
+      } catch (storageError) {
+        console.error('Storage lookup failed, falling back to in-memory cache:', storageError.message);
+        
+        // Fallback to in-memory cache, but sort by startedAt
+        const memoryDialogues = Array.from(this.activeDialogues.values())
+          .filter(session => !currentProjectId || session.projectId === currentProjectId)
+          .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+          
+        if (memoryDialogues.length > 0) {
+          dialogueId = memoryDialogues[0].id;
+          console.error(`Found most recent dialogue from memory cache: ${dialogueId}`);
+        } else {
+          console.error('No active dialogue found in memory cache either');
+        }
+      }
+    }
     const userResponse = args.response || '';
 
     try {
       // First check in-memory active dialogues
       let session = this.activeDialogues.get(dialogueId);
       
-      // If not found in memory, try loading from persistent storage
-      if (!session) {
-        // Try to get the project ID from the current active project
-        const activeProject = await this.projectManagement.getActiveProject();
-        const projectId = activeProject ? activeProject.project_id : null;
-        
-        if (projectId) {
-          session = await this.loadDialogueSession(projectId, dialogueId);
-          if (session) {
-            // Restore session to active dialogues
-            this.activeDialogues.set(dialogueId, session);
-          }
+      // If not found in memory, try loading from SQLite database
+      if (!session && dialogueId) {
+        console.error(`Session not found in memory, loading from database: ${dialogueId}`);
+        session = await this._loadDialogueSession(dialogueId);
+        if (session) {
+          console.error(`Session loaded from database: ${session.id}`);
+          // Restore session to active dialogues
+          this.activeDialogues.set(dialogueId, session);
+        } else {
+          console.error(`Session not found in database either: ${dialogueId}`);
         }
       }
       
@@ -147,6 +193,9 @@ export class ClarificationDialogue {
 
       session.responses.push(responseData);
       session.currentRound++;
+      
+      // Save updated session to persistence
+      await this._saveDialogueSession(session);
 
       // Analyze convergence
       const convergenceAnalysis = this.analyzeGoalConvergence(session);
@@ -159,12 +208,15 @@ export class ClarificationDialogue {
       // Generate next question based on patterns
       const nextQuestion = this.generateAdaptiveQuestion(session, convergenceAnalysis);
       session.lastQuestion = nextQuestion.text;
+      
+      // Save session state before returning
+      await this._saveDialogueSession(session);
 
       // Update uncertainty map
       this.updateUncertaintyMap(session, responseData);
 
-      // Save updated session
-      await this.saveDialogueSession(session.projectId, session);
+      // Save updated session to SQLite
+      await this._saveDialogueSession(session);
 
       return {
         success: true,
@@ -572,8 +624,8 @@ export class ClarificationDialogue {
     session.finalConfidence = confidence;
     session.completedAt = new Date().toISOString();
 
-    // Save final session
-    await this.saveDialogueSession(session.projectId, session);
+    // Save final session to SQLite
+    await this._saveDialogueSession(session);
 
     // Generate recommendations for next steps
     const nextSteps = this.generateNextSteps(refinedGoal, convergingThemes);
@@ -730,20 +782,12 @@ export class ClarificationDialogue {
   }
 
   /**
-   * Save dialogue session to persistent storage
+   * Save dialogue session to persistent storage (deprecated - now handled by DialoguePersistence)
    */
   async saveDialogueSession(projectId, session) {
     try {
-      const sessionData = {
-        ...session,
-        lastSaved: new Date().toISOString(),
-      };
-
-      await this.dataPersistence.saveProjectData(
-        projectId,
-        `clarification_dialogue_${session.id}.json`,
-        sessionData
-      );
+      // Use the new SQLite-based persistence
+      await this._saveDialogueSession(session);
 
       // Update vector store with dialogue content
       await this.updateVectorStoreWithDialogue(projectId, session);
@@ -753,14 +797,12 @@ export class ClarificationDialogue {
   }
 
   /**
-   * Load existing dialogue session
+   * Load existing dialogue session (deprecated - now handled by DialoguePersistence)
    */
   async loadDialogueSession(projectId, dialogueId) {
     try {
-      const sessionData = await this.dataPersistence.loadProjectData(
-        projectId,
-        `clarification_dialogue_${dialogueId}.json`
-      );
+      // Use the new SQLite-based persistence
+      const sessionData = await this._loadDialogueData(dialogueId);
 
       if (sessionData) {
         this.activeDialogues.set(dialogueId, sessionData);
@@ -776,30 +818,32 @@ export class ClarificationDialogue {
    * Get all active dialogue sessions for a project
    */
   getActiveDialogues(projectId) {
-    return Array.from(this.activeDialogues.values())
+    // Return from in-memory cache first
+    const memoryDialogues = Array.from(this.activeDialogues.values())
       .filter(session => session.projectId === projectId && session.status === 'active');
+    
+    return memoryDialogues;
   }
 
   /**
-   * Resume all active dialogues from persistent storage on server restart
+   * Resume all active dialogues from SQLite database on server restart
    */
   async resumeActiveDialogues(projectId) {
     try {
-      const projectFiles = await this.dataPersistence.listProjectFiles(projectId);
-      const dialogueFiles = projectFiles.filter(file => file.startsWith('clarification_dialogue_'));
+      // Get all active dialogues from SQLite database
+      const activeDialogues = await this._getActiveDialogues(projectId);
       
-      for (const file of dialogueFiles) {
+      for (const session of activeDialogues) {
         try {
-          const sessionData = await this.dataPersistence.loadProjectData(projectId, file);
-          if (sessionData && sessionData.status === 'active') {
-            // Restore active dialogues to memory
-            this.activeDialogues.set(sessionData.id, sessionData);
-            console.log(`Resumed dialogue session: ${sessionData.id}`);
-          }
+          // Restore active dialogues to memory
+          this.activeDialogues.set(session.id, session);
+          console.log(`Resumed dialogue session: ${session.id}`);
         } catch (error) {
-          console.error(`Failed to resume dialogue session from ${file}:`, error.message);
+          console.error(`Failed to resume dialogue session ${session.id}:`, error.message);
         }
       }
+      
+      console.log(`Resumed ${activeDialogues.length} active dialogue sessions for project ${projectId}`);
     } catch (error) {
       console.error('Failed to resume active dialogues:', error.message);
     }
@@ -808,9 +852,12 @@ export class ClarificationDialogue {
   /**
    * List all active dialogue sessions for debugging
    */
-  listActiveDialogues() {
-    const activeSessions = Array.from(this.activeDialogues.values())
-      .map(session => ({
+  async listActiveDialogues() {
+    try {
+      // Get all active dialogues from SQLite database
+      const activeDialogues = await this._getActiveDialogues();
+      
+      const activeSessions = activeDialogues.map(session => ({
         id: session.id,
         projectId: session.projectId,
         status: session.status,
@@ -818,9 +865,13 @@ export class ClarificationDialogue {
         startedAt: session.startedAt,
         originalGoal: session.originalGoal
       }));
-    
-    console.log('Active dialogue sessions:', activeSessions);
-    return activeSessions;
+      
+      console.log('Active dialogue sessions:', activeSessions);
+      return activeSessions;
+    } catch (error) {
+      console.error('Failed to list active dialogues:', error.message);
+      return [];
+    }
   }
 
   /**
@@ -960,5 +1011,74 @@ export class ClarificationDialogue {
       `Confidence progression: ${confidenceProgression}`,
       `Final transformation: ${session.originalGoal} → ${refinedGoal.text}`
     ].join('. ');
+  }
+
+  // ===== PERSISTENCE HELPER METHODS =====
+
+  /**
+   * Save dialogue session using DataPersistence system
+   */
+  async _saveDialogueSession(session) {
+    try {
+      const dialogueData = {
+        dialogues: await this._loadDialogueData() || [],
+      };
+      
+      // Remove existing session with same ID if it exists
+      dialogueData.dialogues = dialogueData.dialogues.filter(d => d.id !== session.id);
+      
+      // Add new/updated session
+      dialogueData.dialogues.push(session);
+      
+      // Save to global storage
+      await this.dataPersistence.saveGlobalData('clarification-dialogues.json', dialogueData);
+      
+      console.log(`Saved dialogue session: ${session.id}`);
+    } catch (error) {
+      console.error('Failed to save dialogue session:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Load all dialogue data
+   */
+  async _loadDialogueData() {
+    try {
+      const data = await this.dataPersistence.loadGlobalData('clarification-dialogues.json');
+      return data?.dialogues || [];
+    } catch (error) {
+      console.error('Failed to load dialogue data:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Get active dialogues for a project
+   */
+  async _getActiveDialogues(projectId) {
+    try {
+      const allDialogues = await this._loadDialogueData();
+      return allDialogues.filter(dialogue => 
+        dialogue.status === 'active' && 
+        (!projectId || dialogue.projectId === projectId)
+      );
+    } catch (error) {
+      console.error('Failed to get active dialogues:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Load dialogue session by ID
+   */
+  async _loadDialogueSession(dialogueId) {
+    try {
+      const allDialogues = await this._loadDialogueData();
+      return allDialogues.find(d => d.id === dialogueId) || null;
+    } catch (error) {
+      console.error('Failed to load dialogue session:', error.message);
+      return null;
+    }
   }
 }

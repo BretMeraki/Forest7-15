@@ -29,6 +29,7 @@ function recordFailure() {
   failureCount += 1;
   if (failureCount >= FAILURE_THRESHOLD) {
     openUntil = Date.now() + COOLDOWN_MS;
+    console.warn(`[CircuitBreaker] Opening circuit breaker for ${COOLDOWN_MS}ms after ${failureCount} failures`);
   }
 }
 
@@ -49,6 +50,9 @@ async function execute(asyncFn, timeoutMs = DEFAULT_TIMEOUT_MS, operationName = 
     console.warn(`[CircuitBreaker] OPEN - skipping ${operationName} (will retry in ${Math.round((openUntil - Date.now()) / 1000)}s)`);
     throw new Error('Circuit breaker is open – skipping external request');
   }
+  
+  // Check and reset half-open state
+  halfOpenReset();
 
   console.log(`[CircuitBreaker] Executing ${operationName} with ${timeoutMs}ms timeout`);
   const startTime = Date.now();

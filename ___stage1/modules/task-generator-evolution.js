@@ -5,6 +5,7 @@
 
 import { FILE_NAMES, DEFAULT_PATHS, TASK_STRATEGY_CONSTANTS } from './memory-sync.js';
 import { guard } from '../utils/hta-guard.js';
+import { requireProjectId, validateCommonArgs } from '../utils/parameter-validator.js';
 
 export class TaskGeneratorEvolution {
   constructor(dataPersistence, projectManagement = null, llmInterface = null, eventBus = null) {
@@ -20,19 +21,16 @@ export class TaskGeneratorEvolution {
   // ===== STRATEGY EVOLUTION FUNCTIONALITY =====
 
   async evolveStrategy(args) {
-    // Handle both object format (from MCP) and individual parameters
-    const feedback = args.feedback || args || '';
-    const projectId = args.project_id || args.projectId || null;
-    const pathName = args.path_name || args.pathName || null;
     try {
-      let activeProjectId = projectId;
-      if (!activeProjectId) {
-        const activeProject = await this.projectManagement.getActiveProject();
-        if (!activeProject || !activeProject.project_id) {
-          throw new Error('No active project found. Please create or switch to a project first.');
-        }
-        activeProjectId = activeProject.project_id;
-      }
+      // Validate and extract parameters
+      const params = validateCommonArgs(args, {
+        requireFeedback: false,
+        methodName: 'evolveStrategy'
+      });
+      
+      const activeProjectId = await requireProjectId(args, this.projectManagement, 'evolveStrategy');
+      const feedback = params.feedback || args || '';
+      const pathName = params.pathName;
       const config = await this.dataPersistence.loadProjectData(activeProjectId, FILE_NAMES.CONFIG);
       const activePath = config?.activePath || pathName || 'general';
 

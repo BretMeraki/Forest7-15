@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/bretmeraki/.forest-data",
+        "/Users/bretmeraki/Downloads/7-3forest-main/___stage1"
+      ],
+      "disabled": false,
+      "autoApprove": []
+    },
+    "forest": {
+      "command": "node",
+      "args": [
+        "/Users/bretmeraki/Downloads/7-3forest-main/___stage1/forest-mcp-server.js"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "get_landing_page_forest",
+        "current_status_forest",
+        "build_hta_tree_forest",
+        "create_project_forest",
+        "get_hta_status_forest",
+        "get_next_pipeline_forest",
+        "complete_block_forest",
+        "get_next_task_forest",
+        "evolve_strategy_forest",
+        "generate_daily_schedule_forest",
+        "switch_project_forest",
+        "adaptive_evolution_forest"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "sequentialthinking"
+      ]
+    }
+  }
+}

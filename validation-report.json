@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-07-13T01:36:32.031Z",
+  "summary": {
+    "total_issues": 9,
+    "total_warnings": 8,
+    "total_successes": 7
+  },
+  "issues": [
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\hta-core.js: Potentially unterminated single quote on line 716",
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\hta-core.js: Potentially unterminated single quote on line 1278",
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js: Potentially unterminated single quote on line 226",
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js: Potentially unterminated single quote on line 232",
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js: Potentially unterminated single quote on line 234",
+    "Syntax issue in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js: Potentially unterminated single quote on line 265",
+    "Server startup timeout",
+    "Server startup failed with code null",
+    "Error output: 2025-07-13T01:36:22.869Z Starting Forest MCP server initialization...\n[forest-log] [INFO] [CoreInitialization] Initialized with consolidated architecture\n[forest-log] [INFO] [CoreInitialization] Starting Forest system initialization...\n[forest-log] [DEBUG] [CoreInitialization] Starting phase: Core Infrastructure\n[forest-log] [LocalServer] Initialized with forest-mcp-server\n2025-07-13T01:36:22.885Z [SQLiteCacheManager] Initialized cache with path: C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\stubs\\cache.db\n[forest-log] ✅ Enhanced HTA Core initialized with Schema-Driven Intelligence\n[forest-log] [HTA-Vector] Initializing SQLite as primary provider\n2025-07-13T01:36:22.896Z [DiagnosticVerifier] Using project root: C:\\Users\\schlansk\\Downloads\\7-3forest-main\n2025-07-13T01:36:22.899Z [ClaudeDiagnosticHelper] Using project root: C:\\Users\\schlansk\\Downloads\\7-3forest-main\n[forest-log] [HTA-Vector] Initializing SQLite as primary provider\n2025-07-13T01:36:22.903Z [SQLiteCacheManager] Initialized cache with path: C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\stubs\\cache.db\n[forest-log] [Stage1CoreServer] Initialized with consolidated modules\n[forest-log] 🚀 Initializing Stage1 Core Server...\n[forest-log] Background processor started\n[forest-log] Background task hta-expansion-check scheduled every 300000ms\n[forest-log] [McpCore] Setting up MCP handlers...\n[forest-log] [McpCore] Tool router connected\n[forest-log] ✅ MCP handlers configured with 41 tools\n[forest-log] 📊 Initializing vector intelligence...\n[forest-log] [HTA-Vector] Provider initialized: SQLiteVecProvider\n[forest-log] [ForestDataVectorization] Testing vector store integrity...\n[forest-log] [ForestDataVectorization] ✅ Vector store integrity test passed\n[forest-log] [ForestDataVectorization] Initialized with selective vectorization strategy\n[forest-log] ✅ Forest Data Vectorization ready\n[forest-log] [HTA-Vector] Initializing SQLite as primary provider\n[forest-log] [HTA-Vector] Provider initialized: SQLiteVecProvider\n[forest-log] ✅ HTA Vector Store initialized successfully\n[forest-log] ✅ Vector store connected to Enhanced HTA Core\n[forest-log] ✅ Vector intelligence ready\n2025-07-13T01:36:22.989Z AmbiguousDesiresManager initialized successfully\n[forest-log] ✅ AmbiguousDesiresManager initialized\n[forest-log] ✅ Stage1 Core Server initialized successfully\n[forest-log] [DEBUG] [CoreInitialization] Phase completed: Core Infrastructure { duration: '116ms' }\n[forest-log] [DEBUG] [CoreInitialization] Starting phase: Module Validation\n[forest-log] [DEBUG] [CoreInitialization] Module validated: dataPersistence\n[forest-log] [DEBUG] [CoreInitialization] Module validated: projectManagement\n[forest-log] [DEBUG] [CoreInitialization] Module validated: htaCore\n[forest-log] [DEBUG] [CoreInitialization] Module validated: taskStrategyCore\n[forest-log] [DEBUG] [CoreInitialization] Module validated: coreIntelligence\n[forest-log] [DEBUG] [CoreInitialization] Module validated: memorySync\n[forest-log] [DEBUG] [CoreInitialization] Module validated: mcpCore\n[forest-log] [INFO] [CoreInitialization] All consolidated modules validated { moduleCount: 7, validModules: 7 }\n[forest-log] [DEBUG] [CoreInitialization] Phase completed: Module Validation { duration: '22ms' }\n[forest-log] [DEBUG] [CoreInitialization] Starting phase: Health Checks\n[forest-log] [INFO] [CoreInitialization] Health checks passed { checkCount: 3, healthyChecks: 3 }\n[forest-log] [DEBUG] [CoreInitialization] Phase completed: Health Checks { duration: '5ms' }\n[forest-log] [DEBUG] [CoreInitialization] Starting phase: Health Monitoring Integration\n[forest-log] [INFO] [CoreInitialization] Health monitoring integrated into core server\n[forest-log] [DEBUG] [CoreInitialization] Phase completed: Health Monitoring Integration { duration: '4ms' }\n[forest-log] [INFO] [CoreInitialization] Forest system initialized successfully { duration: '161ms', phases: 4 }\n[forest-log] [StdioTransport] Connected to server\n2025-07-13T01:36:23.042Z Forest MCP server started successfully.\n"
+  ],
+  "warnings": [
+    "Possible multi-line template literal on line 999 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\core-server.js",
+    "Possible multi-line template literal on line 1018 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\core-server.js",
+    "Possible multi-line template literal on line 1251 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\hta-core.js",
+    "Possible multi-line template literal on line 1283 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\hta-core.js",
+    "Possible multi-line template literal on line 216 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js",
+    "Possible multi-line template literal on line 236 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js",
+    "Possible multi-line template literal on line 291 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js",
+    "Possible multi-line template literal on line 301 in C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\core-intelligence.js"
+  ],
+  "successes": [
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\forest-mcp-server.js validated successfully",
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\core-server.js validated successfully",
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\core-initialization.js validated successfully",
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\data-persistence.js validated successfully",
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\project-management.js validated successfully",
+    "✅ C:\\Users\\schlansk\\Downloads\\7-3forest-main\\___stage1\\modules\\task-strategy-core.js validated successfully",
+    "✅ Data structures validated successfully"
+  ]
+}

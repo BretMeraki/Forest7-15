@@ -207,37 +207,14 @@ class VectorStore {
 }
 
 function getProviderInstance(config) {
-  // Try to use the configured primary provider
-  if (config.provider === 'chroma') {
-    try {
-      console.error('[HTA-Vector] Initializing ChromaDB as primary provider');
-      return new ChromaDBProvider(config.chroma);
-    } catch (e) {
-      console.error('[HTA-Vector] ChromaDBProvider init failed:', e && e.message ? e.message : e);
-    }
+  // Use SQLite as the primary provider exclusively.
+  try {
+    console.error('[HTA-Vector] Initializing SQLite as primary provider');
+    return new SQLiteVecProvider(config.sqlitevec);
+  } catch (e) {
+    console.error('[HTA-Vector] SQLiteVecProvider init failed:', e && e.message ? e.message : e);
+    throw new Error('Failed to initialize SQLite provider');
   }
-  
-  if (config.provider === 'qdrant') {
-    try {
-      console.error('[HTA-Vector] Initializing Qdrant as primary provider');
-      return new QdrantProvider(config.qdrant);
-    } catch (e) {
-      console.error('[HTA-Vector] QdrantProvider init failed:', e && e.message ? e.message : e);
-    }
-  }
-  
-  if (config.provider === 'sqlitevec') {
-    try {
-      console.error('[HTA-Vector] Initializing SQLite as primary provider');
-      return new SQLiteVecProvider(config.sqlitevec);
-    } catch (e) {
-      console.error('[HTA-Vector] SQLiteVecProvider init failed:', e && e.message ? e.message : e);
-    }
-  }
-  
-  // Fallback to LocalJSON provider
-  console.error('[HTA-Vector] Using LocalJSON fallback provider');
-  return new LocalJSONProvider(config.localjson);
 }
 
 class HTAVectorStore {

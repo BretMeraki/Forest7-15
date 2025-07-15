@@ -285,8 +285,10 @@ class PRDComplianceValidator {
     
     // Test that evolve_strategy tool exists and is callable
     try {
-      const tools = this.coreInit.server.mcpCore.getToolDefinitions();
-      const evolveStrategyTool = tools.find(t => t.name === 'evolve_strategy_forest');
+      const tools = this.coreInit.server.mcpCore.getToolDefinitions() || [];
+      // Handle both array and non-array cases
+      const toolsArray = Array.isArray(tools) ? tools : [];
+      const evolveStrategyTool = toolsArray.find(t => t.name === 'evolve_strategy_forest');
       
       if (!evolveStrategyTool) {
         throw new Error('evolve_strategy_forest tool not found');
@@ -309,8 +311,10 @@ class PRDComplianceValidator {
     
     // Test that complete_block triggers strategy evolution
     try {
-      const tools = this.coreInit.server.mcpCore.getToolDefinitions();
-      const completeBlockTool = tools.find(t => t.name === 'complete_block_forest');
+      const tools = this.coreInit.server.mcpCore.getToolDefinitions() || [];
+      // Handle both array and non-array cases
+      const toolsArray = Array.isArray(tools) ? tools : [];
+      const completeBlockTool = toolsArray.find(t => t.name === 'complete_block_forest');
       
       if (!completeBlockTool) {
         throw new Error('complete_block_forest tool not found');

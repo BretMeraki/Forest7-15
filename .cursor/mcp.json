@@ -1,28 +1,14 @@
 {
   "mcpServers": {
-    "filesystem": {
-      "command": "npx",
+    "serena": {
+      "command": "python",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "C:\\Users\\schlansk\\Downloads\\7-3forest-main",
-        "C:\\Users\\schlansk\\Documents"
-      ]
-    },
-    "forest": {
-      "command": "C:\\Users\\schlansk\\local-node\\node-v20.14.0-win-x64\\node.exe",
-      "args": [
-        "C:\\Users\\schlansk\\Downloads\\7-3forest-main\\7-3forest-main\\___stage1\\forest-mcp-server.js"
+        "C:\\Users\\schlansk\\Downloads\\serena\\scripts\\mcp_server.py"
       ],
+      "cwd": "C:\\Users\\schlansk\\Downloads\\serena",
       "env": {
-        "FOREST_DATA_DIR": "C:\\Users\\schlansk\\Downloads\\7-3forest-main\\.forest-data"
+        "PYTHONPATH": "C:\\Users\\schlansk\\Downloads\\serena\\src"
       }
-    },
-    "context7": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@upstash/context7-mcp@latest"],
-      "disabled": false,
-      "autoApprove": []
     }
   }
 } 

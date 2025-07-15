@@ -6,146 +6,211 @@
 import { ForestIntelligenceAdapter } from './core-intelligence.js';
 
 /**
- * Domain analysis and classification utilities
+ * Pure LLM-driven domain analysis - no hardcoded patterns
  */
 export class DomainAnalyzer {
-    static DOMAIN_PATTERNS = {
-        technical: {
-            keywords: ['programming', 'code', 'software', 'web', 'app', 'development', 'api', 'database', 'framework'],
-            learningStyle: 'hands-on',
-            progressionType: 'incremental-building',
-            typical_phases: ['setup', 'basics', 'practice', 'projects', 'advanced', 'specialization']
-        },
-        creative: {
-            keywords: ['art', 'design', 'music', 'writing', 'creative', 'visual', 'aesthetic', 'composition'],
-            learningStyle: 'experiential',
-            progressionType: 'exploratory-refinement',
-            typical_phases: ['exploration', 'technique', 'practice', 'style', 'portfolio', 'mastery']
-        },
-        academic: {
-            keywords: ['study', 'research', 'theory', 'academic', 'science', 'analysis', 'methodology'],
-            learningStyle: 'structured',
-            progressionType: 'cumulative-knowledge',
-            typical_phases: ['foundation', 'concepts', 'application', 'synthesis', 'research', 'expertise']
-        },
-        business: {
-            keywords: ['business', 'marketing', 'sales', 'management', 'strategy', 'finance', 'entrepreneurship'],
-            learningStyle: 'practical',
-            progressionType: 'problem-solving',
-            typical_phases: ['understanding', 'strategy', 'implementation', 'measurement', 'optimization', 'scaling']
-        },
-        skill_based: {
-            keywords: ['skill', 'technique', 'method', 'practice', 'improvement', 'mastery', 'performance'],
-            learningStyle: 'deliberate-practice',
-            progressionType: 'skill-building',
-            typical_phases: ['fundamentals', 'practice', 'feedback', 'refinement', 'consistency', 'expertise']
-        },
-        lifestyle: {
-            keywords: ['health', 'fitness', 'habit', 'personal', 'lifestyle', 'wellness', 'routine'],
-            learningStyle: 'behavioral',
-            progressionType: 'habit-formation',
-            typical_phases: ['awareness', 'planning', 'initiation', 'consistency', 'adaptation', 'integration']
-        }
-    };
-
-    static analyzeDomain(goal, context = {}) {
-        const goalText = goal.toLowerCase();
-        const contextText = JSON.stringify(context).toLowerCase();
-        const combinedText = `${goalText} ${contextText}`;
-
-        const domainScores = {};
-        
-        // Score each domain based on keyword matches
-        for (const [domain, pattern] of Object.entries(this.DOMAIN_PATTERNS)) {
-            let score = 0;
-            for (const keyword of pattern.keywords) {
-                if (combinedText.includes(keyword)) {
-                    score += 1;
-                }
-            }
-            domainScores[domain] = {
-                score,
-                percentage: score / pattern.keywords.length,
-                ...pattern
-            };
-        }
-
-        // Find the highest scoring domain
-        const bestMatch = Object.entries(domainScores)
-            .sort(([,a], [,b]) => b.score - a.score)[0];
-
-        return {
-            primaryDomain: bestMatch[0],
-            domainInfo: bestMatch[1],
-            allScores: domainScores,
-            confidence: bestMatch[1].percentage
-        };
-    }
-
-    static getComplexityIndicators(goal, context = {}) {
-        const complexityFactors = {
-            length: goal.length > 100 ? 2 : goal.length > 50 ? 1 : 0,
-            multipleAreas: (goal.match(/and|or|plus|also|including/gi) || []).length,
-            technicalTerms: (goal.match(/\b[A-Z]{2,}\b|framework|system|architecture|methodology/g) || []).length,
-            timeframe: context.deadline ? (new Date(context.deadline) - new Date()) < 30 * 24 * 60 * 60 * 1000 ? 3 : 1 : 0,
-            prerequisites: context.prerequisites ? context.prerequisites.length : 0,
-            scope: goal.includes('master') || goal.includes('expert') ? 3 : goal.includes('learn') ? 1 : 2
-        };
-
-        const totalScore = Object.values(complexityFactors).reduce((sum, val) => sum + val, 0);
-        const maxPossibleScore = 15; // Rough maximum
-        
-        const normalizedScore = Math.min(10, Math.round((totalScore / maxPossibleScore) * 10));
-        
-        let level;
-        if (normalizedScore <= 3) level = 'beginner';
-        else if (normalizedScore <= 6) level = 'intermediate';
-        else if (normalizedScore <= 8) level = 'advanced';
-        else level = 'expert';
-
-        return {
-            score: normalizedScore,
-            level,
-            factors: complexityFactors,
-            estimatedTimeframe: this.estimateTimeframe(normalizedScore, context)
-        };
-    }
-
-    static estimateTimeframe(complexityScore, context = {}) {
-        if (context.deadline) return context.deadline;
-        
-        const baseWeeks = {
-            1: 1, 2: 2, 3: 3, 4: 6, 5: 8, 
-            6: 12, 7: 16, 8: 24, 9: 36, 10: 52
-        };
-        
-        return `${baseWeeks[complexityScore] || 52} weeks`;
-    }
-}
-
-/**
- * Intelligent task generation that adapts to domain and context
- */
-export class DomainAgnosticTaskGenerator {
     constructor() {
         this.intelligenceAdapter = new ForestIntelligenceAdapter();
     }
 
-    async generateAdaptiveTasks(goal, context = {}, options = {}) {
-        // Analyze the domain and complexity
-        const domainAnalysis = DomainAnalyzer.analyzeDomain(goal, context);
-        const complexityAnalysis = DomainAnalyzer.getComplexityIndicators(goal, context);
+    async analyzeDomain(goal, context = {}) {
+        const system = `You are a domain analysis expert who identifies the learning characteristics of any goal without relying on predefined categories.`;
         
-        // Generate domain-specific learning strategy
+        const user = `Analyze this learning goal to determine its natural characteristics:
+
+**Goal**: ${goal}
+**Context**: ${JSON.stringify(context, null, 2)}
+
+Determine the optimal learning approach by analyzing the goal's inherent nature. Don't categorize into predefined domains - instead identify the unique characteristics that would determine the best learning strategy.`;
+
+        const schema = {
+            type: "object",
+            properties: {
+                goal_analysis: {
+                    type: "object",
+                    properties: {
+                        learning_style: { 
+                            type: "string",
+                            description: "Optimal learning approach (e.g., hands-on, theoretical, experiential, structured, etc.)"
+                        },
+                        progression_type: { 
+                            type: "string",
+                            description: "How learning should progress (e.g., incremental, exploratory, cumulative, etc.)"
+                        },
+                        knowledge_type: {
+                            type: "string", 
+                            description: "Type of knowledge being acquired (e.g., procedural, declarative, experiential, etc.)"
+                        },
+                        complexity_indicators: {
+                            type: "array",
+                            items: { type: "string" },
+                            description: "Factors that indicate this goal's complexity"
+                        }
+                    }
+                },
+                optimal_phases: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Natural learning phases for this specific goal"
+                },
+                learning_characteristics: {
+                    type: "object",
+                    properties: {
+                        requires_practice: { type: "boolean" },
+                        requires_theory: { type: "boolean" },
+                        requires_feedback: { type: "boolean" },
+                        requires_tools: { type: "boolean" },
+                        requires_community: { type: "boolean" }
+                    }
+                },
+                confidence_level: { 
+                    type: "number", 
+                    minimum: 0.0, 
+                    maximum: 1.0,
+                    description: "Confidence in this analysis"
+                }
+            },
+            required: ["goal_analysis", "optimal_phases", "learning_characteristics", "confidence_level"]
+        };
+
+        const request = await this.intelligenceAdapter.core.request({
+            method: 'llm/completion',
+            params: {
+                system,
+                user,
+                schema,
+                max_tokens: 1500,
+                temperature: 0.3
+            }
+        });
+
+        return {
+            analysisType: 'llm_driven',
+            ...request,
+            analyzedAt: new Date().toISOString()
+        };
+    }
+
+    async getComplexityIndicators(goal, context = {}) {
+        const system = `You are a learning complexity analyst who evaluates the inherent difficulty and scope of any learning goal.`;
+        
+        const user = `Analyze the complexity of this learning goal:
+
+**Goal**: ${goal}
+**Context**: ${JSON.stringify(context, null, 2)}
+
+Evaluate the natural complexity without relying on keyword matching or domain assumptions. Consider the goal's scope, depth requirements, prerequisite knowledge needs, and time investment required.`;
+
+        const schema = {
+            type: "object",
+            properties: {
+                complexity_analysis: {
+                    type: "object",
+                    properties: {
+                        complexity_score: { 
+                            type: "integer", 
+                            minimum: 1, 
+                            maximum: 10,
+                            description: "Overall complexity rating"
+                        },
+                        complexity_level: { 
+                            type: "string",
+                            enum: ["beginner", "intermediate", "advanced", "expert"],
+                            description: "Complexity category"
+                        },
+                        complexity_factors: {
+                            type: "array",
+                            items: { type: "string" },
+                            description: "Specific factors contributing to complexity"
+                        },
+                        prerequisite_requirements: {
+                            type: "array",
+                            items: { type: "string" },
+                            description: "Knowledge/skills needed before starting"
+                        }
+                    }
+                },
+                time_estimation: {
+                    type: "object",
+                    properties: {
+                        estimated_duration: { 
+                            type: "string",
+                            description: "Realistic time estimate for achieving the goal"
+                        },
+                        milestone_timeline: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    milestone: { type: "string" },
+                                    estimated_time: { type: "string" }
+                                }
+                            }
+                        },
+                        confidence_level: { 
+                            type: "string",
+                            enum: ["low", "moderate", "high"],
+                            description: "Confidence in time estimation"
+                        }
+                    }
+                },
+                learning_demands: {
+                    type: "object",
+                    properties: {
+                        cognitive_load: { type: "string", enum: ["low", "moderate", "high"] },
+                        practice_intensity: { type: "string", enum: ["light", "moderate", "intensive"] },
+                        resource_requirements: { type: "array", items: { type: "string" } }
+                    }
+                }
+            },
+            required: ["complexity_analysis", "time_estimation", "learning_demands"]
+        };
+
+        const request = await this.intelligenceAdapter.core.request({
+            method: 'llm/completion',
+            params: {
+                system,
+                user,
+                schema,
+                max_tokens: 1500,
+                temperature: 0.3
+            }
+        });
+
+        return {
+            analysisType: 'llm_driven',
+            ...request,
+            analyzedAt: new Date().toISOString()
+        };
+    }
+}
+
+/**
+ * Intelligent task generation that adapts to any goal using pure LLM analysis
+ */
+export class DomainAgnosticTaskGenerator {
+    constructor() {
+        this.intelligenceAdapter = new ForestIntelligenceAdapter();
+        this.domainAnalyzer = new DomainAnalyzer();
+    }
+
+    async generateAdaptiveTasks(goal, context = {}, options = {}) {
+        // Use LLM-driven analysis instead of hardcoded patterns
+        const domainAnalysis = await this.domainAnalyzer.analyzeDomain(goal, context);
+        const complexityAnalysis = await this.domainAnalyzer.getComplexityIndicators(goal, context);
+        
+        // Generate completely adaptive learning strategy based on LLM analysis
         const strategyRequest = await this.intelligenceAdapter.requestStrategicBranches(
             goal,
             complexityAnalysis,
             options.focusAreas || [],
-            options.learningStyle || domainAnalysis.domainInfo.learningStyle,
+            options.learningStyle || domainAnalysis.goal_analysis?.learning_style || 'adaptive',
             { 
                 ...context, 
-                domainType: domainAnalysis.primaryDomain,
-                progressionType: domainAnalysis.domainInfo.progressionType
+                learningCharacteristics: domainAnalysis.learning_characteristics,
+                progressionType: domainAnalysis.goal_analysis?.progression_type,
+                knowledgeType: domainAnalysis.goal_analysis?.knowledge_type,
+                optimalPhases: domainAnalysis.optimal_phases
             }
         );
 
@@ -155,8 +220,9 @@ export class DomainAgnosticTaskGenerator {
             strategyRequest,
             metadata: {
                 generatedAt: new Date().toISOString(),
-                adaptationLevel: domainAnalysis.confidence,
-                estimatedDuration: complexityAnalysis.estimatedTimeframe
+                adaptationLevel: domainAnalysis.confidence_level,
+                estimatedDuration: complexityAnalysis.time_estimation?.estimated_duration,
+                analysisMethod: 'llm_driven'
             }
         };
     }
@@ -455,23 +521,20 @@ export class TaskGenerationUtils {
         return `${phaseSlug}${titleSlug}-${timestamp}`;
     }
 
-    static estimateTaskTime(description, complexity, domainType = 'general') {
+    static estimateTaskTime(description, complexity, learningCharacteristics = {}) {
         const baseMinutes = {
             1: 30, 2: 60, 3: 120, 4: 240, 5: 480
         };
         
-        const domainMultipliers = {
-            technical: 1.3,
-            creative: 1.1,
-            academic: 1.4,
-            business: 0.9,
-            skill_based: 1.2,
-            lifestyle: 0.8
-        };
+        // Use learning characteristics instead of hardcoded domain multipliers
+        let multiplier = 1.0;
+        
+        if (learningCharacteristics.requires_practice) multiplier += 0.3;
+        if (learningCharacteristics.requires_theory) multiplier += 0.2;
+        if (learningCharacteristics.requires_tools) multiplier += 0.2;
+        if (learningCharacteristics.requires_feedback) multiplier += 0.1;
         
         const base = baseMinutes[complexity] || 120;
-        const multiplier = domainMultipliers[domainType] || 1.0;
-        
         const totalMinutes = Math.round(base * multiplier);
         
         if (totalMinutes < 60) return `${totalMinutes} minutes`;
