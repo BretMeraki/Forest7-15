@@ -41,6 +41,8 @@ export class ProjectManagement {
     this.dataPersistence = dataPersistence;
     this.logger = null; // Will be initialized lazily
     this.activeProjectId = null;
+    this.initialized = false;
+    this.initPromise = null;
   }
 
   /**
@@ -51,6 +53,70 @@ export class ProjectManagement {
       this.logger = await loggerModule.getLogger();
     }
     return this.logger;
+  }
+
+  /**
+   * Initialize the ProjectManagement instance by loading the active project from global config
+   */
+  async initialize() {
+    if (this.initialized) {
+      return;
+    }
+    
+    if (this.initPromise) {
+      await this.initPromise;
+      return;
+    }
+
+    this.initPromise = this._doInitialize();
+    await this.initPromise;
+  }
+
+  async _doInitialize() {
+    try {
+      const logger = await this.getLogger();
+      logger.debug('[ProjectManagement] Initializing project management');
+
+      // Load active project from global config
+      const globalData = await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG);
+      if (globalData?.activeProject) {
+        // Verify the active project exists
+        if (await this.dataPersistence.projectExists(globalData.activeProject)) {
+          this.activeProjectId = globalData.activeProject;
+          logger.info('[ProjectManagement] Loaded active project from config', { 
+            project_id: this.activeProjectId 
+          });
+        } else {
+          logger.warn('[ProjectManagement] Active project in config does not exist', { 
+            project_id: globalData.activeProject 
+          });
+          // Clear invalid active project from global config
+          globalData.activeProject = null;
+          await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData);
+        }
+      } else {
+        logger.debug('[ProjectManagement] No active project found in global config');
+      }
+
+      this.initialized = true;
+      logger.debug('[ProjectManagement] Initialization completed', { 
+        activeProjectId: this.activeProjectId 
+      });
+    } catch (error) {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Initialization failed', { error: error.message });
+      // Don't throw - allow the system to work without initialization
+      this.initialized = true;
+    }
+  }
+
+  /**
+   * Ensure initialization before any operation that depends on active project state
+   */
+  async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initialize();
+    }
   }
 
   /**
@@ -129,25 +195,64 @@ export class ProjectManagement {
           transaction
         );
 
-        // Update global configuration
-        const globalData = (await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG)) || {
-          projects: [],
-        };
+        // Update global configuration with enhanced error handling
+        logger.info('[ProjectManagement] Loading global configuration for project registration');
+        let globalData;
+        try {
+          globalData = await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG);
+        } catch (error) {
+          logger.warn('[ProjectManagement] Failed to load global config, creating new one', { error: error.message });
+          globalData = null;
+        }
+        
+        // Initialize global data structure if missing or invalid
+        if (!globalData || typeof globalData !== 'object') {
+          globalData = { projects: [] };
+          logger.info('[ProjectManagement] Initialized new global configuration');
+        }
+        
+        // Ensure projects array exists and is valid
         if (!Array.isArray(globalData.projects)) {
           globalData.projects = [];
+          logger.info('[ProjectManagement] Initialized projects array in global config');
         }
-        // PATCH: Add null check for globalData.projects before using find
-        if (!globalData.projects || !globalData.projects.find || !globalData.projects.find(function(p){return p.id === project_id;})) {
-          globalData.projects.push({
-            id: project_id,
-            goal,
-            created_at: projectConfig.created_at,
-            last_accessed: new Date().toISOString(),
-          });
+        
+        // Check if project already exists in global config
+        const existingProjectIndex = globalData.projects.findIndex(p => p && p.id === project_id);
+        const projectEntry = {
+          id: project_id,
+          goal,
+          created_at: projectConfig.created_at,
+          last_accessed: new Date().toISOString(),
+        };
+        
+        if (existingProjectIndex === -1) {
+          globalData.projects.push(projectEntry);
+          logger.info('[ProjectManagement] Added new project to global config', { project_id, totalProjects: globalData.projects.length });
+        } else {
+          globalData.projects[existingProjectIndex] = projectEntry;
+          logger.info('[ProjectManagement] Updated existing project in global config', { project_id });
         }
 
+        // Set as active project
         globalData.activeProject = project_id;
-        await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData, transaction);
+        logger.info('[ProjectManagement] Set active project in global config', { project_id });
+        
+        // Save updated global configuration
+        try {
+          await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData, transaction);
+          logger.info('[ProjectManagement] Successfully saved global configuration', { 
+            project_id, 
+            projectsCount: globalData.projects.length,
+            activeProject: globalData.activeProject 
+          });
+        } catch (error) {
+          logger.error('[ProjectManagement] Failed to save global configuration', { 
+            project_id, 
+            error: error.message 
+          });
+          throw new Error(`Failed to update global configuration: ${error.message}`);
+        }
 
         // Initialize empty data files
         await this.initializeProjectData(project_id, learning_paths, transaction);
@@ -158,7 +263,7 @@ export class ProjectManagement {
         // Set as active project
         this.activeProjectId = project_id;
 
-        this.logger.info('[ProjectManagement] Project created successfully', {
+        logger.info('[ProjectManagement] Project created successfully', {
           project_id,
           learning_paths: learning_paths.length,
           knowledge_level: knowledgeLevel,
@@ -214,7 +319,9 @@ export class ProjectManagement {
 
   async switchProject(project_id) {
     try {
-      this.logger.info('[ProjectManagement] Switching to project', { project_id });
+      await this.ensureInitialized();
+      const logger = await this.getLogger();
+      logger.info('[ProjectManagement] Switching to project', { project_id });
 
       // Check if project exists
       if (!(await this.dataPersistence.projectExists(project_id))) {
@@ -227,27 +334,44 @@ export class ProjectManagement {
         throw new Error(`Project ${project_id} has invalid configuration`);
       }
 
-      // Update global config
-      const globalData = (await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG)) || {
-        projects: [],
-      };
-      if (!Array.isArray(globalData.projects)) {
-        globalData.projects = [];
+      // Update global config with transaction to ensure atomicity
+      const transaction = this.dataPersistence.beginTransaction();
+      
+      try {
+        const globalData = (await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG)) || {
+          projects: [],
+        };
+        if (!Array.isArray(globalData.projects)) {
+          globalData.projects = [];
+        }
+        globalData.activeProject = project_id;
+
+        // Update last accessed time
+        const projectEntry = globalData.projects.find(p => p.id === project_id);
+        if (projectEntry) {
+          projectEntry.last_accessed = new Date().toISOString();
+        }
+
+        // Save with transaction
+        await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData, transaction);
+        
+        // Commit transaction
+        await this.dataPersistence.commitTransaction(transaction);
+        
+        // Set as active project AFTER successful save
+        this.activeProjectId = project_id;
+        
+        logger.info('[ProjectManagement] Project switch completed successfully', { 
+          project_id,
+          activeProjectId: this.activeProjectId 
+        });
+      } catch (error) {
+        // Rollback on error
+        await this.dataPersistence.rollbackTransaction(transaction);
+        throw error;
       }
-      globalData.activeProject = project_id;
 
-      // Update last accessed time
-      const projectEntry = globalData.projects.find(p => p.id === project_id);
-      if (projectEntry) {
-        projectEntry.last_accessed = new Date().toISOString();
-      }
-
-      await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData);
-
-      // Set as active project
-      this.activeProjectId = project_id;
-
-      this.logger.info('[ProjectManagement] Project switched successfully', { project_id });
+      logger.info('[ProjectManagement] Project switched successfully', { project_id });
 
       return {
         content: [
@@ -265,7 +389,8 @@ export class ProjectManagement {
         project_config: config,
       };
     } catch (error) {
-      this.logger.error('[ProjectManagement] Project switch failed', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Project switch failed', {
         project_id,
         error: error.message,
       });
@@ -348,6 +473,8 @@ export class ProjectManagement {
 
   async getActiveProject() {
     try {
+      await this.ensureInitialized();
+      
       // First check if we have a cached active project
       if (this.activeProjectId) {
         const config = await this.dataPersistence.loadProjectData(
@@ -355,6 +482,8 @@ export class ProjectManagement {
           FILE_NAMES.CONFIG
         );
         if (config) {
+          const logger = await this.getLogger();
+          logger.debug('[ProjectManagement] Active project found in cache', { project_id: this.activeProjectId });
           return {
             content: [
               {
@@ -372,6 +501,11 @@ export class ProjectManagement {
             project_id: this.activeProjectId,
             project_config: config,
           };
+        } else {
+          // Cached project no longer exists, clear cache
+          const logger = await this.getLogger();
+          logger.warn('[ProjectManagement] Cached active project no longer exists', { project_id: this.activeProjectId });
+          this.activeProjectId = null;
         }
       }
 
@@ -426,7 +560,8 @@ export class ProjectManagement {
         project_config: config,
       };
     } catch (error) {
-      this.logger.error('[ProjectManagement] Failed to get active project', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to get active project', {
         error: error.message,
       });
 
@@ -553,14 +688,16 @@ export class ProjectManagement {
         );
       }
 
-      this.logger.debug('[ProjectManagement] Project data initialized', {
+      const logger = await this.getLogger();
+      logger.debug('[ProjectManagement] Project data initialized', {
         projectId,
         pathCount: learningPaths.length,
       });
 
       return true;
     } catch (error) {
-      this.logger.error('[ProjectManagement] Failed to initialize project data', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to initialize project data', {
         projectId,
         error: error.message,
       });
@@ -570,6 +707,7 @@ export class ProjectManagement {
 
   async updateProjectProgress(projectId, progress) {
     try {
+      await this.ensureInitialized();
       const config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
       if (!config) {
         throw new Error(`Project ${projectId} not found`);
@@ -583,14 +721,16 @@ export class ProjectManagement {
 
       await this.dataPersistence.saveProjectData(projectId, FILE_NAMES.CONFIG, config);
 
-      this.logger.debug('[ProjectManagement] Project progress updated', {
+      const logger = await this.getLogger();
+      logger.debug('[ProjectManagement] Project progress updated', {
         projectId,
         progress: config.progress,
       });
 
       return config.progress;
     } catch (error) {
-      this.logger.error('[ProjectManagement] Failed to update project progress', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to update project progress', {
         projectId,
         progress,
         error: error.message,
@@ -601,6 +741,7 @@ export class ProjectManagement {
 
   async setActivePath(projectId, pathName) {
     try {
+      await this.ensureInitialized();
       const config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
       if (!config) {
         throw new Error(`Project ${projectId} not found`);
@@ -618,14 +759,16 @@ export class ProjectManagement {
 
       await this.dataPersistence.saveProjectData(projectId, FILE_NAMES.CONFIG, config);
 
-      this.logger.info('[ProjectManagement] Active path updated', {
+      const logger = await this.getLogger();
+      logger.info('[ProjectManagement] Active path updated', {
         projectId,
         pathName,
       });
 
       return pathName;
     } catch (error) {
-      this.logger.error('[ProjectManagement] Failed to set active path', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to set active path', {
         projectId,
         pathName,
         error: error.message,
@@ -634,7 +777,8 @@ export class ProjectManagement {
     }
   }
 
-  getActiveProjectId() {
+  async getActiveProjectId() {
+    await this.ensureInitialized();
     return this.activeProjectId;
   }
 
@@ -671,5 +815,60 @@ export class ProjectManagement {
     
     const base = words.join('_') || 'project';
     return `${base}_${Date.now().toString(36).slice(-4)}`;
+  }
+
+  /**
+   * Require an active project or throw an error
+   * This method is used by other modules that need to ensure a project is active
+   */
+  async requireActiveProject() {
+    await this.ensureInitialized();
+    const logger = await this.getLogger();
+    
+    // Try multiple methods to get active project
+    let projectId = this.activeProjectId;
+    let config = null;
+    
+    // Method 1: Use cached project ID
+    if (projectId) {
+      config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
+      if (config) {
+        logger.debug('[ProjectManagement] Active project found in cache', { project_id: projectId });
+        return { projectId, config };
+      }
+    }
+    
+    // Method 2: Load from global config
+    const globalData = await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG);
+    if (globalData?.activeProject) {
+      projectId = globalData.activeProject;
+      config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
+      if (config) {
+        // Update cache
+        this.activeProjectId = projectId;
+        logger.debug('[ProjectManagement] Active project found in global config', { project_id: projectId });
+        return { projectId, config };
+      }
+    }
+
+    // --- Fallback: auto-activate sole existing project ---
+    const allProjects = await this.dataPersistence.getProjectList();
+    if (allProjects && allProjects.length === 1) {
+      projectId = allProjects[0].id;
+      config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
+      if (config) {
+        logger.info('[ProjectManagement] Auto-activating sole existing project', { project_id: projectId });
+        const globalConfig = (await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG)) || {};
+        globalConfig.activeProject = projectId;
+        await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalConfig);
+        this.activeProjectId = projectId;
+        return { projectId, config };
+      }
+    }
+
+    // No active project found after fallbacks
+    const errorMsg = 'No active project found. Please create a project using create_project_forest or switch to an existing project using switch_project_forest first.';
+    logger.warn('[ProjectManagement] requireActiveProject called but no active project exists after all fallbacks');
+    throw new Error(errorMsg);
   }
 }

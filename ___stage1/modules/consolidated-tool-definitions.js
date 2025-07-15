@@ -237,29 +237,6 @@ export const FOREST_TOOLS = {
     }
   },
 
-  ask_truthful_claude_forest: {
-    name: 'ask_truthful_claude_forest',
-    description: 'Query truthful Claude with structured prompts and context. REQUIRED: prompt parameter.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        prompt: {
-          type: 'string',
-          description: '**REQUIRED** Your question or request for Claude'
-        },
-        context: {
-          type: 'object',
-          description: 'Optional: Additional context for the query'
-        },
-        response_format: {
-          type: 'string',
-          enum: ['text', 'json', 'markdown'],
-          description: 'Optional: Desired response format (default: text)'
-        }
-      },
-      required: ['prompt']
-    }
-  },
 
   // ========== GATED ONBOARDING FLOW ==========
   start_gated_onboarding_forest: {
@@ -808,6 +785,116 @@ export const FOREST_TOOLS = {
         }
       }
     }
+  },
+
+  // ========== CODE ANALYSIS TOOLS ==========
+  analyze_code_ast_forest: {
+    name: 'analyze_code_ast_forest',
+    description: 'Provide detailed AST analysis of Forest code for Claude to understand structure and identify improvement opportunities. Always enabled for full codebase visibility.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_paths: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of file paths to analyze (relative to Forest root directory). If omitted, analyzes entire codebase when full visibility is enabled.'
+        },
+        analysis_type: {
+          type: 'string',
+          enum: ['structure', 'complexity', 'patterns', 'task_generation', 'summary'],
+          default: 'structure',
+          description: 'Type of analysis to perform'
+        },
+        focus_area: {
+          type: 'string',
+          description: 'Optional: Specific area to focus analysis on (e.g., "task generation", "generic patterns")'
+        }
+      },
+      required: []
+    }
+  },
+
+  // ========== READ-ONLY FILESYSTEM TOOLS ==========
+  read_file_forest: {
+    name: 'read_file_forest',
+    description: 'Read file contents safely with read-only access. Claude can view code but cannot modify it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_path: {
+          type: 'string',
+          description: 'Path to the file to read (relative to project root)'
+        }
+      },
+      required: ['file_path']
+    }
+  },
+
+  list_files_forest: {
+    name: 'list_files_forest',
+    description: 'List files and directories with read-only access. Shows file structure without write permissions.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        directory_path: {
+          type: 'string',
+          description: 'Directory path to list (relative to project root). Leave empty for root directory.',
+          default: ''
+        }
+      },
+      required: []
+    }
+  },
+
+  search_files_forest: {
+    name: 'search_files_forest',
+    description: 'Search for files matching a pattern with read-only access.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pattern: {
+          type: 'string',
+          description: 'Search pattern to match against filenames'
+        },
+        search_path: {
+          type: 'string',
+          description: 'Directory to search within (relative to project root)',
+          default: ''
+        }
+      },
+      required: ['pattern']
+    }
+  },
+
+  get_file_info_forest: {
+    name: 'get_file_info_forest',
+    description: 'Get file metadata and information without reading content.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_path: {
+          type: 'string',
+          description: 'Path to the file to get info for (relative to project root)'
+        }
+      },
+      required: ['file_path']
+    }
+  },
+
+  read_multiple_files_forest: {
+    name: 'read_multiple_files_forest',
+    description: 'Read multiple files efficiently with read-only access.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file_paths: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of file paths to read (relative to project root, max 50 files)'
+        }
+      },
+      required: ['file_paths']
+    }
   }
 
 };
@@ -854,8 +941,7 @@ export const TOOL_CATEGORIES = {
     'generate_daily_schedule_forest'
   ],
   'Advanced Features': [
-    'sync_forest_memory_forest',
-    'ask_truthful_claude_forest'
+    'sync_forest_memory_forest'
   ],
   'System Management': [
     'factory_reset_forest',
@@ -888,6 +974,16 @@ export const TOOL_CATEGORIES = {
     'smart_evolution_forest',
     'adaptive_evolution_forest',
     'get_ambiguous_desire_status_forest'
+  ],
+  'Code Analysis': [
+    'analyze_code_ast_forest'
+  ],
+  'Read-Only Filesystem': [
+    'read_file_forest',
+    'list_files_forest',
+    'search_files_forest',
+    'get_file_info_forest',
+    'read_multiple_files_forest'
   ]
 };
 

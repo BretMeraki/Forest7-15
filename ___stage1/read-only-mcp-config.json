@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/bretmeraki/.forest-data",
+        "/Users/bretmeraki/Downloads/7-3forest-main/___stage1"
+      ],
+      "env": {
+        "FILESYSTEM_READ_ONLY": "true"
+      }
+    },
+    "forest": {
+      "command": "node",
+      "args": [
+        "/Users/bretmeraki/Downloads/7-3forest-main/___stage1/forest-mcp-server.js"
+      ],
+      "cwd": "/Users/bretmeraki/Downloads/7-3forest-main/___stage1",
+      "env": {
+        "STAGE1_READ_ONLY": "true"
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
+}

@@ -40,9 +40,6 @@ export const toolSchemas = {
   sync_forest_memory_forest: {
     required: [],
   },
-  ask_truthful_claude_forest: {
-    required: ['prompt'],
-  },
   get_health_status_forest: {
     required: [],
   },

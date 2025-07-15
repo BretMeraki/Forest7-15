@@ -414,21 +414,40 @@ export class DiagnosticHandlers {
    */
   async emergencyClearCache(args) {
     try {
-      const { project_id, clear_all = false } = args;
+      const { project_id, clear_all = false, include_databases = false } = args;
       
       if (clear_all) {
-        // Clear entire cache
-        const result = this.dataPersistence.emergencyClearCache();
-        return {
-          content: [{
-            type: 'text',
-            text: `**🚨 EMERGENCY CACHE CLEARED**\n\n` +
-                  `**Scope**: All cached data\n` +
-                  `**Action**: Full cache clear\n` +
-                  `**Timestamp**: ${new Date().toISOString()}\n\n` +
-                  `All cached data has been cleared. Next data access will reload from disk.`
-          }]
-        };
+        if (include_databases) {
+          // Clear entire cache AND database files
+          const result = await this.dataPersistence.clearAllPersistentStorage();
+          return {
+            content: [{
+              type: 'text',
+              text: `**🚨 EMERGENCY CACHE AND DATABASE CLEARED**\n\n` +
+                    `**Scope**: All cached data and database files\n` +
+                    `**Action**: Complete storage clear\n` +
+                    `**Timestamp**: ${new Date().toISOString()}\n\n` +
+                    `**Result**: ${result.message}\n\n` +
+                    `**Cleared**: ${result.cleared.join(', ')}\n\n` +
+                    (result.errors.length > 0 ? `**Errors**: ${result.errors.map(e => e.file + ': ' + e.error).join(', ')}\n\n` : '') +
+                    `All cached data and database files have been cleared. System is now in clean state.`
+            }]
+          };
+        } else {
+          // Clear entire cache only
+          const result = this.dataPersistence.emergencyClearCache();
+          return {
+            content: [{
+              type: 'text',
+              text: `**🚨 EMERGENCY CACHE CLEARED**\n\n` +
+                    `**Scope**: All cached data\n` +
+                    `**Action**: Full cache clear\n` +
+                    `**Timestamp**: ${new Date().toISOString()}\n\n` +
+                    `All cached data has been cleared. Next data access will reload from disk.\n\n` +
+                    `**💡 Tip**: Use \`include_databases: true\` to also clear database files for complete reset.`
+            }]
+          };
+        }
       } else if (project_id) {
         // Clear specific project cache
         const result = this.dataPersistence.emergencyClearProjectCache(project_id);

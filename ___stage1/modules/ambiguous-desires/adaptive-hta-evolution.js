@@ -7,6 +7,7 @@
 import { FILE_NAMES, DEFAULT_PATHS } from '../memory-sync.js';
 import { guard } from '../../utils/hta-guard.js';
 import { HtaCore } from '../hta-core.js';
+import { requireProjectId, validateCommonArgs } from '../../utils/parameter-validator.js';
 
 const EVOLUTION_CONSTANTS = {
   UNCERTAINTY_HIGH_THRESHOLD: 0.7,
@@ -40,21 +41,18 @@ export class AdaptiveHTAEvolution {
    * Adaptive strategy evolution that can rewrite goals and manage uncertainty
    */
   async adaptiveEvolution(args) {
-    const feedback = args.feedback || args.context || '';
-    const projectId = args.project_id || args.projectId || null;
-    const pathName = args.path_name || args.pathName || null;
-    const allowGoalRewrite = args.allow_goal_rewrite !== false; // Default to true
-    const uncertaintyLevel = args.uncertainty_level || this.assessFeedbackUncertainty(feedback);
-
     try {
-      let activeProjectId = projectId;
-      if (!activeProjectId) {
-        const activeProject = await this.projectManagement.getActiveProject();
-        if (!activeProject || !activeProject.project_id) {
-          throw new Error('No active project found. Please create or switch to a project first.');
-        }
-        activeProjectId = activeProject.project_id;
-      }
+      // Validate and extract parameters
+      const params = validateCommonArgs(args, {
+        requireFeedback: false,
+        methodName: 'adaptiveEvolution'
+      });
+      
+      const activeProjectId = await requireProjectId(args, this.projectManagement, 'adaptiveEvolution');
+      const feedback = params.feedback || args.context || '';
+      const pathName = params.pathName;
+      const allowGoalRewrite = args.allow_goal_rewrite !== false; // Default to true
+      const uncertaintyLevel = args.uncertainty_level || this.assessFeedbackUncertainty(feedback);
 
       const config = await this.dataPersistence.loadProjectData(activeProjectId, FILE_NAMES.CONFIG);
       const activePath = config?.activePath || pathName || 'general';

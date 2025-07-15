@@ -23,10 +23,10 @@ async function testProductionReadiness() {
         const server = new Stage1CoreServer({
             dataPersistence: { dataDir: './.forest-data' },
             vectorProvider: {
-                provider: 'ChromaDBProvider',
+                provider: 'SQLiteVecProvider',
                 config: { 
-                    collection: 'forest_vectors',
-                    url: 'http://localhost:8000'
+                    dbPath: './.forest-data/vectors.db',
+                    enableCache: true
                 }
             }
         });

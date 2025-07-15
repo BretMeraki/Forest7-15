@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "test": "npx jest",
+    "test:compliance": "npx jest ___stage1/__tests__/compliance.test.js",
     "test:golden-path": "npx jest test/test-golden-path.js",
     "test:task-scorer": "npx jest modules/task-logic/__tests__/task-scorer.test.js",
     "test:nan-prevention": "npx jest modules/task-logic/__tests__/task-scorer.test.js --testNamePattern='NaN Prevention'",

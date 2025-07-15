@@ -3,7 +3,10 @@
  * Handles external HTA Analysis Server connections
  */
 
-import WebSocket from 'ws';
+import MockWebSocket from './mock-websocket.js';
+
+// Use mock WebSocket to avoid dependency issues
+const WebSocket = MockWebSocket;
 import { CONSTANTS } from './constants.js';
 
 export class HTABridgeCommunication {

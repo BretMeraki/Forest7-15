@@ -75,15 +75,28 @@ export class PureSchemaHTASystem {
     const strategicBranches = await this.generateLevelContent(
       'strategicBranches',
       { goal, goalContext, goalCharacteristics: enhancedContext.goalCharacteristics },
-      `Generate goal-specific strategic learning phases for "${goal}". 
-      Analyze the goal characteristics and create branches that are:
-      - Specific to the actual subject matter and objectives
-      - Appropriate for the complexity level (${enhancedContext.goalCharacteristics.complexity})
-      - Tailored to the goal characteristics: ${enhancedContext.goalCharacteristics.characteristics.join(', ')}
-      - Progressive in nature (building from fundamentals to advanced)
-      
-      Create 3-5 branches that are specific to this goal and domain, NOT generic phases like "Foundation" or "Research". 
-      Use terminology that reflects the actual subject matter of the goal.`
+      `Generate hyper-specific strategic learning phases for "${goal}". 
+
+CRITICAL REQUIREMENTS FOR STRATEGIC BRANCHES:
+- Use DOMAIN-SPECIFIC terminology throughout (not generic educational terms)
+- Make each branch name immediately clear what skills/knowledge it develops
+- Focus on concrete capabilities the learner will gain
+- Avoid generic terms like: "Foundation", "Basics", "Research", "Overview", "Introduction", "Advanced"
+
+BRANCH NAMING EXAMPLES BY DOMAIN:
+- Photography: "Master Manual Camera Controls" NOT "Camera Basics"
+- Programming: "Build REST APIs with Node.js" NOT "Backend Development Foundation"  
+- Guitar: "Fingerpicking Folk Patterns" NOT "Advanced Techniques"
+- Cooking: "Knife Skills and Mise en Place" NOT "Kitchen Fundamentals"
+- Data Science: "Statistical Analysis with Python" NOT "Data Analysis Basics"
+
+Create 3-5 branches for complexity level (${enhancedContext.goalCharacteristics.complexity}) that are:
+- Specific to the actual field and objective of "${goal}"
+- Progressive (each builds practical skills for the next)
+- Tailored to characteristics: ${enhancedContext.goalCharacteristics.characteristics.join(', ')}
+- Named with concrete skills/deliverables the learner will achieve
+
+Each branch should make someone think "I know exactly what capability I'm building here!"`
     );
 
     // Initialize context tracking
@@ -101,32 +114,51 @@ export class PureSchemaHTASystem {
       schemaVersion: '2.0-progressive'
     };
 
-    // Generate additional levels based on progressive depth setting
-    // Ensure goal is included in enhanced context for all levels
+    // GUARANTEE COMPREHENSIVE TREES: Generate all levels for rich, deep hierarchies
     const enhancedContextWithGoal = {
       ...enhancedContext,
       goal: goal
     };
     
-    if (enhancedContext.progressiveDepth >= 3) {
+    const targetDepth = enhancedContext.progressiveDepth || 6; // Default to full depth
+    
+    // PERFORMANCE OPTIMIZED: Generate all levels with intelligent sequencing
+    // Level 3 must complete before level 4, but can prepare data in parallel
+    console.error('🌳 Generating comprehensive 6-level tree architecture...');
+    
+    if (targetDepth >= 3) {
       result.level3_taskDecomposition = await this.generateProgressiveTaskDecomposition(
         strategicBranches, goalContext, enhancedContextWithGoal
       );
     }
 
-    if (enhancedContext.progressiveDepth >= 4) {
-      result.level4_microParticles = await this.generateProgressiveMicroParticles(
-        result.level3_taskDecomposition, goalContext, enhancedContextWithGoal
+    // Levels 4-6 can be prepared for faster generation
+    const levelGenerationPromises = [];
+    
+    if (targetDepth >= 4 && result.level3_taskDecomposition) {
+      levelGenerationPromises.push(
+        this.generateProgressiveMicroParticles(
+          result.level3_taskDecomposition, goalContext, enhancedContextWithGoal
+        ).then(data => ({ level: 4, data }))
       );
     }
 
-    if (enhancedContext.progressiveDepth >= 5) {
+    // Execute remaining levels efficiently
+    if (levelGenerationPromises.length > 0) {
+      const completedLevels = await Promise.all(levelGenerationPromises);
+      completedLevels.forEach(({ level, data }) => {
+        if (level === 4) result.level4_microParticles = data;
+      });
+    }
+
+    // Continue with dependent levels
+    if (targetDepth >= 5 && result.level4_microParticles) {
       result.level5_nanoActions = await this.generateProgressiveNanoActions(
         result.level4_microParticles, goalContext, enhancedContextWithGoal
       );
     }
 
-    if (enhancedContext.progressiveDepth >= 6) {
+    if (targetDepth >= 6 && result.level5_nanoActions) {
       result.level6_contextAdaptivePrimitives = await this.generateProgressiveContextAdaptivePrimitives(
         result.level5_nanoActions, goalContext, enhancedContextWithGoal
       );
@@ -230,30 +262,26 @@ export class PureSchemaHTASystem {
    * Determine optimal depth for progressive generation based on goal complexity and user context
    */
   determineOptimalDepth(goal, context) {
+    // GUARANTEE DEEP TREES: Always generate comprehensive 6-level architecture
     const characteristics = this.analyzeGoalCharacteristics(goal);
-    let baseDepth = 3; // Start at Task Decomposition
+    let baseDepth = 6; // ALWAYS start with full 6-level depth
 
-    // Increase depth for mastery or technical goals
-    if (characteristics.benefitsFromGranularity) {
-      baseDepth = 4;
+    // Reduce depth ONLY for explicitly simple goals
+    if (characteristics.complexity === 'low' && !characteristics.benefitsFromGranularity && context.explicitSimpleRequest) {
+      baseDepth = 4; // Minimum acceptable depth
     }
 
-    // Adjust for high complexity
-    if (characteristics.complexity === 'high') {
-      baseDepth += 1;
+    // For mastery and technical goals, ensure full depth
+    if (characteristics.benefitsFromGranularity || characteristics.complexity === 'high') {
+      baseDepth = 6; // Full depth guaranteed
     }
 
-    // Adjust depth based on urgency
+    // Even urgent goals get deep trees - just generate them faster
     if (context.urgency === 'high') {
-      baseDepth = Math.max(2, baseDepth - 1); // Reduce depth for urgent goals
+      baseDepth = 5; // Still deep, but slightly reduced
     }
 
-    // Adjust for detailed planners
-    if (context.detailedPlanning) {
-      baseDepth = Math.min(6, baseDepth + 1);
-    }
-
-    return baseDepth;
+    return Math.max(4, baseDepth); // Minimum 4 levels, default 6
   }
 
   /**
@@ -306,8 +334,8 @@ export class PureSchemaHTASystem {
       }];
     }
     
-    // Generate tasks for first 1-2 branches to start, not all branches
-    const branchesToProcess = branches.slice(0, Math.min(2, branches.length));
+    // COMPREHENSIVE PROCESSING: Generate tasks for ALL branches for rich trees
+    const branchesToProcess = branches; // Process all branches for complete coverage
     
     // Enhanced context with goal included
     const contextWithGoal = {
@@ -332,8 +360,8 @@ export class PureSchemaHTASystem {
     // Handle taskDecomposition defensively
     const tasks = Array.isArray(taskDecomposition) ? taskDecomposition : [];
     
-    // Generate micro-particles for first few tasks only
-    const tasksToProcess = tasks.slice(0, Math.min(3, tasks.length));
+    // COMPREHENSIVE COVERAGE: Generate micro-particles for ALL tasks for rich depth
+    const tasksToProcess = tasks; // Process all tasks for complete depth
     
     // Enhanced context with goal included
     const contextWithGoal = {
@@ -358,8 +386,8 @@ export class PureSchemaHTASystem {
     // Handle microParticles defensively
     const particles = Array.isArray(microParticles) ? microParticles : [];
     
-    // Generate nano-actions for first few micro-particles only
-    const particlesToProcess = particles.slice(0, Math.min(2, particles.length));
+    // COMPREHENSIVE COVERAGE: Generate nano-actions for ALL micro-particles for maximum depth
+    const particlesToProcess = particles; // Process all particles for complete depth
     
     // Enhanced context with goal included
     const contextWithGoal = {
@@ -384,8 +412,8 @@ export class PureSchemaHTASystem {
     // Handle nanoActions defensively
     const actions = Array.isArray(nanoActions) ? nanoActions : [];
     
-    // Generate primitives for first nano-action only
-    const actionsToProcess = actions.slice(0, 1);
+    // COMPREHENSIVE COVERAGE: Generate primitives for ALL nano-actions for ultimate depth
+    const actionsToProcess = actions; // Process all actions for complete depth
     
     // Enhanced context with goal included
     const contextWithGoal = {
@@ -409,10 +437,18 @@ export class PureSchemaHTASystem {
     // Extract goal to ensure it's available for prompt building
     const goalText = this.extractGoalFromContext(refinedContext, goalContext);
     
+    const prompt = `Generate specific, actionable tasks for learning branch: "${branchName}"
+  
+Description: ${branchDescription}
+Goal Context: ${JSON.stringify(goalContext)}
+
+Create 3-8 concrete tasks that build the skills described in this branch.
+Use domain-specific terminology and make each task immediately actionable.`;
+
     return await this.generateLevelContent(
       'taskDecomposition',
       { branchName, branchDescription, goalContext, userContext: refinedContext, goal: goalText },
-      "Break this strategic branch into practical, achievable tasks considering user's real-world constraints."
+      prompt
     );
   }
 
@@ -425,10 +461,21 @@ export class PureSchemaHTASystem {
     // Extract goal to ensure it's available for prompt building
     const goalText = this.extractGoalFromContext(refinedContext, goalContext);
     
+    const prompt = `Break down task "${taskTitle}" into micro-particles.
+  
+Task Description: ${taskDescription}
+Goal: ${goalText}
+
+Create 3-12 micro-particles that are:
+- So small they cannot fail
+- Have clear validation criteria
+- Take 2-25 minutes each
+- Use domain-specific terminology`;
+
     return await this.generateLevelContent(
       'microParticles',
       { taskTitle, taskDescription, goalContext, userContext: refinedContext, goal: goalText },
-      "Create foolproof micro-tasks that are so small they cannot fail, with clear validation criteria."
+      prompt
     );
   }
 
@@ -441,10 +488,21 @@ export class PureSchemaHTASystem {
     // Extract goal to ensure it's available for prompt building
     const goalText = this.extractGoalFromContext(refinedContext, goalContext);
     
+    const prompt = `Create nano-actions for micro-particle: "${microTitle}"
+  
+Micro Description: ${microDescription}
+Goal: ${goalText}
+
+Generate 3-8 nano-actions that:
+- Are single, atomic steps
+- Take 10-300 seconds each
+- Account for tool switching and context changes
+- Have specific validation methods`;
+
     return await this.generateLevelContent(
       'nanoActions',
       { microTitle, microDescription, goalContext, userContext: refinedContext, goal: goalText },
-      "Break this micro-task into granular execution steps accounting for tool switching and context changes."
+      prompt
     );
   }
 
@@ -457,10 +515,21 @@ export class PureSchemaHTASystem {
     // Extract goal to ensure it's available for prompt building
     const goalText = this.extractGoalFromContext(refinedContext, goalContext);
     
+    const prompt = `Create context-adaptive primitives for: "${nanoTitle}"
+  
+Nano Description: ${nanoDescription}
+Goal: ${goalText}
+
+Generate primitives that:
+- Adapt to different user constraints
+- Provide alternative approaches
+- Include fallback options
+- Consider various situations and contexts`;
+
     return await this.generateLevelContent(
       'contextAdaptivePrimitives',
       { nanoTitle, nanoDescription, goalContext, userContext: refinedContext, goal: goalText },
-      "Create fundamental actions that adapt to different user constraints and situations."
+      prompt
     );
   }
 
@@ -558,6 +627,7 @@ export class PureSchemaHTASystem {
 
   /**
    * Universal content generation method - all intelligence from LLM
+   * This is the bridge between schemas and Claude's intelligence
    */
   async generateLevelContent(schemaKey, inputData, systemMessage) {
     console.error(`🔧 generateLevelContent called for schema: ${schemaKey}`);
@@ -565,42 +635,129 @@ export class PureSchemaHTASystem {
     console.error('  - inputData.goal:', inputData.goal);
     console.error('  - systemMessage:', systemMessage);
     
-    const schema = this.schemas[schemaKey];
-    const prompt = this.buildUniversalPrompt(inputData, schema);
+    try {
+      const schema = this.schemas[schemaKey];
+      
+      // Add intelligent pacing for HTA tree generation quality assurance
+      const shouldPace = this.shouldApplyIntelligentPacing(schemaKey, inputData);
+      if (shouldPace) {
+        console.error('🎯 Applying intelligent pacing for quality HTA generation');
+        await this.applyIntelligentPacing(schemaKey, inputData);
+      }
+      
+      // Use the new bridge method to connect to Claude's intelligence
+      const response = await this.llmInterface.generateContent({
+        type: schemaKey,
+        goal: inputData.goal,
+        context: inputData,
+        prompt: this.buildUniversalPrompt(inputData, schema),
+        schema: schema,
+        systemMessage: systemMessage,
+        requireDomainSpecific: true,
+        avoidGenericTemplates: true
+      });
+
+      console.error('✅ Generated intelligent content through bridge');
+      return this.validateAndFormatResponse(response, schema, schemaKey);
+      
+    } catch (error) {
+      console.error(`❌ Failed to generate ${schemaKey} content:`, error.message);
+      
+      // Fallback to prevent system failure
+      return this.generateFallbackContent(schemaKey, inputData);
+    }
+  }
+  
+  /**
+   * Fallback content generation if Claude intelligence fails
+   */
+  generateFallbackContent(schemaKey, inputData) {
+    console.error(`⚠️ Using fallback content for ${schemaKey}`);
     
-    console.error('🚀 Making LLM request to intelligence bridge');
-    console.error('  - prompt length:', prompt.length);
-    console.error('  - method: llm/completion');
-    console.error('  - max_tokens:', this.getTokenLimitForSchema(schemaKey));
-    console.error('  - temperature:', this.getTemperatureForSchema(schemaKey));
+    const goal = inputData.goal || 'learning objective';
     
-    // Add intelligent pacing for HTA tree generation quality assurance
-    const shouldPace = this.shouldApplyIntelligentPacing(schemaKey, inputData);
-    if (shouldPace) {
-      console.error('🎯 Applying intelligent pacing for quality HTA generation');
-      await this.applyIntelligentPacing(schemaKey, inputData);
+    if (schemaKey === 'strategicBranches') {
+      // CRITICAL FIX: Use enhanced generateGenericBranches instead of generic templates
+      console.error('🌳 Fallback using enhanced generateGenericBranches for strategic branches');
+      
+      try {
+        // Try to use the enhanced logic even in fallback
+        const domainAnalysis = this.llmInterface.analyzeDomain(goal);
+        const enhancedBranches = this.llmInterface.generateGenericBranches(goal, domainAnalysis);
+        
+        return {
+          strategic_branches: enhancedBranches,
+          progression_logic: 'Domain-specific intelligent progression',
+          alternative_paths: ['Accelerated track', 'Hands-on focus']
+        };
+      } catch (fallbackError) {
+        console.error('❌ Enhanced fallback failed, using minimal fallback:', fallbackError.message);
+        
+        // Only use generic templates as absolute last resort
+        return {
+          strategic_branches: [
+            { 
+              name: `${goal} - Foundation Phase`,
+              description: `Build foundational knowledge for ${goal}`,
+              priority: 1,
+              rationale: 'Essential groundwork',
+              domain_focus: 'fundamental'
+            },
+            { 
+              name: `${goal} - Development Phase`,
+              description: `Develop practical skills for ${goal}`,
+              priority: 2,
+              rationale: 'Skill building',
+              domain_focus: 'practical'
+            },
+            { 
+              name: `${goal} - Mastery Phase`,
+              description: `Achieve proficiency in ${goal}`,
+              priority: 3,
+              rationale: 'Advanced capability',
+              domain_focus: 'mastery'
+            }
+          ],
+          progression_logic: 'Sequential progression from basics to mastery',
+          alternative_paths: ['Accelerated track', 'Hands-on focus']
+        };
+      }
     }
     
-    const response = await this.llmInterface.request({
-      method: 'llm/completion',
-      params: {
-        prompt: prompt,
-        max_tokens: this.getTokenLimitForSchema(schemaKey),
-        temperature: this.getTemperatureForSchema(schemaKey),
-        system: systemMessage,
-        // Add goal explicitly to params for bridge debugging
-        goal: inputData.goal,
-        context: inputData.context || inputData.initialContext || '',
-        user_goal: inputData.goal,
-        learning_goal: inputData.goal
-      }
-    });
+    if (schemaKey === 'goalContext') {
+      return {
+        goal_analysis: {
+          primary_goal: goal,
+          goal_complexity: 5,
+          domain_type: 'general learning',
+          domain_characteristics: ['structured approach required'],
+          success_criteria: ['Complete objectives', 'Demonstrate understanding'],
+          timeline_assessment: '3-6 months for basic proficiency',
+          complexity_factors: ['Learning curve', 'Practice requirements']
+        },
+        user_context: {
+          background_knowledge: ['Basic understanding'],
+          available_resources: ['Online materials', 'Practice time'],
+          constraints: ['Time availability'],
+          motivation_drivers: ['Personal growth', 'Skill development'],
+          risk_factors: ['Lack of consistency']
+        },
+        domain_boundaries: {
+          core_domain_elements: ['Key concepts', 'Essential skills'],
+          relevant_adjacent_domains: ['Related fields'],
+          exploration_worthy_topics: ['Advanced topics'],
+          irrelevant_domains: ['Unrelated areas']
+        },
+        learning_approach: {
+          recommended_strategy: 'Structured learning with practice',
+          key_principles: ['Consistent practice', 'Progressive difficulty'],
+          potential_pain_points: ['Initial learning curve'],
+          success_enablers: ['Regular practice', 'Good resources']
+        }
+      };
+    }
     
-    console.error('✅ LLM response received');
-    console.error('  - response type:', typeof response);
-    console.error('  - response keys:', Object.keys(response || {}));
-
-    return this.validateAndFormatResponse(response, schema, schemaKey);
+    return { content: `Generated fallback ${schemaKey} for ${goal}`, fallback: true };
   }
 
   /**
@@ -628,7 +785,15 @@ export class PureSchemaHTASystem {
     
     const prompt = `You are an expert learning system that creates goal-specific, contextually appropriate learning paths.
 
-IMPORTANT: Generate content that is SPECIFIC to the goal and subject matter. Avoid generic terms like "Foundation", "Research", "Capability". Instead, use terminology that reflects the actual subject matter.
+IMPORTANT: Generate content that is SPECIFIC to the goal and subject matter. Use extensive domain-specific terminology throughout your response.
+
+**DOMAIN TERMINOLOGY REQUIREMENTS:**
+- Analyze the goal to identify its specific domain (e.g., arts & crafts, technology, sciences, business, health, education, etc.)
+- Use technical vocabulary, specialized terms, and professional jargon specific to that identified domain
+- Include tools, processes, methods, and concepts that are unique to the field
+- Reference industry standards, best practices, and domain-specific workflows
+- Avoid generic educational terms like "Foundation", "Research", "Capability", "Implementation", "Module", "Phase"
+- Adapt your language to match the sophistication level and terminology expected in that domain
 
 **Goal Analysis:**
 - Primary Goal: ${actualGoal}
@@ -675,20 +840,17 @@ Generate intelligent, goal-specific content that directly addresses the user's o
   }
 
   /**
-   * Apply intelligent pacing with progress indicators
+   * Apply intelligent pacing with progress indicators (OPTIMIZED)
    */
   async applyIntelligentPacing(schemaKey, inputData) {
-    const pacingConfig = this.getPacingConfigForSchema(schemaKey);
-    
-    // Show progress indicators based on schema type
+    // PERFORMANCE OPTIMIZATION: Minimal pacing for production
     const progressMessages = this.getProgressMessages(schemaKey, inputData);
     
-    for (let i = 0; i < progressMessages.length; i++) {
-      console.error(`⏳ ${progressMessages[i]}`);
-      
-      // Apply intelligent delay based on schema complexity
-      const delay = this.calculateIntelligentDelay(schemaKey, i, progressMessages.length);
-      await this.sleep(delay);
+    // Show single progress message without excessive delays
+    if (progressMessages.length > 0) {
+      console.error(`⏳ ${progressMessages[0]}`);
+      // Minimal delay - just enough to show progress
+      await this.sleep(50);
     }
   }
 

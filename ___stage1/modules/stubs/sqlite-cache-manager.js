@@ -1,71 +1,229 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { createRequire } from 'module';
+import { promises as fs } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+let sqlite3;
+try {
+  const require = createRequire(import.meta.url);
+  sqlite3 = require('sqlite3').verbose();
+} catch (error) {
+  console.warn('[SQLiteCacheManager] SQLite3 not available, using in-memory Map');
+}
+
 export class SQLiteCacheManager {
   constructor(dbPath = null) {
-    // Use provided path or default to cache.db in the same directory
     this.dbPath = dbPath || path.join(__dirname, 'cache.db');
+    this.db = null;
+    this.usingSQLite = false;
+    this.initialized = false;
+    this.initPromise = null;
     
-    // For now, use an in-memory Map with persistence capability
-    // This provides the same interface as the DataPersistence expects
+    // Fallback in-memory storage
     this.cache = new Map();
     this.hits = 0;
     this.misses = 0;
-    this.metadata = new Map(); // Store metadata for each key
+    this.metadata = new Map();
     
-    // Initialize persistent storage (future enhancement)
-    this.initializeDatabase();
+    this.initPromise = this.initializeDatabase();
   }
 
-  initializeDatabase() {
-    // Future: Initialize SQLite database for persistence
-    // For now, this is a placeholder to maintain the same interface
-    console.log(`[SQLiteCacheManager] Initialized cache with path: ${this.dbPath}`);
-  }
-
-  get(key) {
-    const entry = this.cache.get(key);
-    const meta = this.metadata.get(key);
-    
-    if (entry && meta) {
-      // Check if entry has expired
-      if (meta.expires_at && Date.now() > meta.expires_at) {
-        this.delete(key);
-        this.misses++;
-        return undefined;
+  async initializeDatabase() {
+    if (sqlite3) {
+      try {
+        // Ensure directory exists
+        await fs.mkdir(path.dirname(this.dbPath), { recursive: true });
+        
+        return new Promise((resolve) => {
+          this.db = new sqlite3.Database(this.dbPath, (err) => {
+            if (err) {
+              console.warn('[SQLiteCacheManager] SQLite initialization failed, using Map:', err.message);
+              this.usingSQLite = false;
+              this.initialized = true;
+              resolve();
+            } else {
+              this.usingSQLite = true;
+              this._createTables(() => {
+                console.log(`[SQLiteCacheManager] SQLite database initialized: ${this.dbPath}`);
+                this.initialized = true;
+                resolve();
+              });
+            }
+          });
+        });
+      } catch (error) {
+        console.warn('[SQLiteCacheManager] SQLite setup failed, using Map:', error.message);
+        this.usingSQLite = false;
+        this.initialized = true;
       }
-      
-      this.hits++;
-      return entry;
     } else {
-      this.misses++;
-      return undefined;
+      console.log(`[SQLiteCacheManager] Using in-memory Map cache`);
+      this.usingSQLite = false;
+      this.initialized = true;
     }
   }
 
-  set(key, value, ttlMs = null) {
-    const timestamp = Date.now();
-    const expires_at = ttlMs ? timestamp + ttlMs : null;
+  async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initPromise;
+    }
+  }
+
+  _createTables(callback) {
+    if (!this.db || !this.usingSQLite) {
+      if (callback) callback();
+      return;
+    }
     
-    this.cache.set(key, value);
-    this.metadata.set(key, {
-      timestamp,
-      expires_at
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS cache_entries (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        timestamp INTEGER,
+        expires_at INTEGER
+      )
+    `;
+    
+    const createStatsSQL = `
+      CREATE TABLE IF NOT EXISTS cache_stats (
+        key TEXT PRIMARY KEY,
+        value INTEGER DEFAULT 0
+      )
+    `;
+    
+    this.db.serialize(() => {
+      this.db.run(createTableSQL);
+      this.db.run(createStatsSQL);
+      
+      // Initialize stats
+      this.db.run('INSERT OR IGNORE INTO cache_stats (key, value) VALUES (?, ?)', ['hits', 0]);
+      this.db.run('INSERT OR IGNORE INTO cache_stats (key, value) VALUES (?, ?)', ['misses', 0], () => {
+        if (callback) callback();
+      });
     });
   }
 
-  delete(key) {
-    const hadKey = this.cache.has(key);
-    this.cache.delete(key);
-    this.metadata.delete(key);
-    return hadKey;
+  async get(key) {
+    await this.ensureInitialized();
+    
+    if (this.usingSQLite && this.db) {
+      return new Promise((resolve) => {
+        this.db.get(
+          'SELECT value, expires_at FROM cache_entries WHERE key = ?',
+          [key],
+          async (err, row) => {
+            if (err || !row) {
+              await this._incrementStat('misses');
+              resolve(undefined);
+              return;
+            }
+            
+            // Check expiration
+            if (row.expires_at && Date.now() > row.expires_at) {
+              await this.delete(key);
+              await this._incrementStat('misses');
+              resolve(undefined);
+              return;
+            }
+            
+            await this._incrementStat('hits');
+            try {
+              resolve(JSON.parse(row.value));
+            } catch (parseErr) {
+              resolve(row.value);
+            }
+          }
+        );
+      });
+    } else {
+      // Fallback to Map
+      const entry = this.cache.get(key);
+      const meta = this.metadata.get(key);
+      
+      if (entry && meta) {
+        if (meta.expires_at && Date.now() > meta.expires_at) {
+          await this.delete(key);
+          this.misses++;
+          return undefined;
+        }
+        
+        this.hits++;
+        return entry;
+      } else {
+        this.misses++;
+        return undefined;
+      }
+    }
   }
 
-  clear() {
-    this.cache.clear();
-    this.metadata.clear();
+  async set(key, value, ttlMs = null) {
+    await this.ensureInitialized();
+    
+    const timestamp = Date.now();
+    const expires_at = ttlMs ? timestamp + ttlMs : null;
+    
+    if (this.usingSQLite && this.db) {
+      const valueStr = typeof value === 'string' ? value : JSON.stringify(value);
+      this.db.run(
+        'INSERT OR REPLACE INTO cache_entries (key, value, timestamp, expires_at) VALUES (?, ?, ?, ?)',
+        [key, valueStr, timestamp, expires_at]
+      );
+    } else {
+      // Fallback to Map
+      this.cache.set(key, value);
+      this.metadata.set(key, {
+        timestamp,
+        expires_at
+      });
+    }
+  }
+
+  async delete(key) {
+    await this.ensureInitialized();
+    
+    if (this.usingSQLite && this.db) {
+      this.db.run('DELETE FROM cache_entries WHERE key = ?', [key]);
+      return true;
+    } else {
+      // Fallback to Map
+      const hadKey = this.cache.has(key);
+      this.cache.delete(key);
+      this.metadata.delete(key);
+      return hadKey;
+    }
+  }
+
+  async _incrementStat(statName) {
+    await this.ensureInitialized();
+    
+    if (this.usingSQLite && this.db) {
+      this.db.run(
+        'UPDATE cache_stats SET value = value + 1 WHERE key = ?',
+        [statName]
+      );
+    } else {
+      if (statName === 'hits') {
+        this.hits++;
+      } else if (statName === 'misses') {
+        this.misses++;
+      }
+    }
+  }
+
+  async clear() {
+    await this.ensureInitialized();
+    
+    if (this.usingSQLite && this.db) {
+      this.db.run('DELETE FROM cache_entries');
+      this.db.run('UPDATE cache_stats SET value = 0');
+    } else {
+      this.cache.clear();
+      this.metadata.clear();
+      this.hits = 0;
+      this.misses = 0;
+    }
   }
 
   keys() {
