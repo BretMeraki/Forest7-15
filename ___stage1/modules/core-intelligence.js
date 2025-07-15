@@ -446,8 +446,76 @@ export class CoreIntelligence {
   }
 
   async generateLogicalDeductions(input) {
-    // Simplified for MCP delegation
-    return [];
+    // Use MCP Intelligence to generate logical deductions
+    const system = "You are a logical reasoning assistant. Analyze the input and generate specific, actionable deductions.";
+    const prompt = `Generate logical deductions from the following input:
+
+Input: ${typeof input === 'string' ? input : JSON.stringify(input)}
+
+Provide deductions as a JSON array where each deduction is an object with:
+- "statement": A clear logical conclusion
+- "confidence": A confidence level (0-1)
+- "reasoning": Brief reasoning for the deduction
+
+Response format: {"deductions": [...]}}`;
+
+    try {
+      const request = MCPIntelligenceCore.createIntelligenceRequest(
+        system, prompt, {
+          schema: {
+            type: 'object',
+            properties: {
+              deductions: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    statement: { type: 'string' },
+                    confidence: { type: 'number' },
+                    reasoning: { type: 'string' }
+                  },
+                  required: ['statement', 'confidence', 'reasoning']
+                }
+              }
+            },
+            required: ['deductions']
+          },
+          temperature: 0.7
+        }
+      );
+      
+      const response = await this.mcpCore.request(request);
+      
+      // Extract deductions from response
+      if (response && response.content) {
+        let content = response.content;
+        
+        // Handle different response formats
+        if (Array.isArray(content)) {
+          content = content.find(item => item.type === 'text')?.text || '';
+        } else if (typeof content === 'object' && content.text) {
+          content = content.text;
+        }
+        
+        // Try to parse JSON from the content
+        try {
+          const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+          return parsed.deductions || [];
+        } catch (parseError) {
+          // If parsing fails, try to extract JSON from text
+          const jsonMatch = content.match(/\{[\s\S]*\}/)?.[0];
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch);
+            return parsed.deductions || [];
+          }
+        }
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error generating logical deductions:', error);
+      return [];
+    }
   }
 
   async generateLLMResponse({ context, prompt, format = 'json' }) {

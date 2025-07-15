@@ -672,4 +672,66 @@ export class ProjectManagement {
     const base = words.join('_') || 'project';
     return `${base}_${Date.now().toString(36).slice(-4)}`;
   }
+
+  /**
+   * Delete a project and all its data
+   */
+  async deleteProject({ project_id }) {
+    try {
+      const logger = await this.getLogger();
+      logger.info('[ProjectManagement] Deleting project', { project_id });
+
+      // Check if project exists
+      const validation = await this.validateProject(project_id);
+      if (!validation.valid) {
+        throw new Error(validation.error);
+      }
+
+      // Delete all project data
+      await this.dataPersistence.deleteProjectData(project_id);
+
+      // Remove from global config
+      const globalData = await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG);
+      if (globalData && globalData.projects) {
+        globalData.projects = globalData.projects.filter(p => p.id !== project_id);
+        
+        // If this was the active project, clear it
+        if (globalData.activeProject === project_id) {
+          globalData.activeProject = null;
+        }
+        
+        await this.dataPersistence.saveGlobalData(FILE_NAMES.CONFIG, globalData);
+      }
+
+      // Clear cache if this was the active project
+      if (this.activeProjectId === project_id) {
+        this.activeProjectId = null;
+      }
+
+      logger.info('[ProjectManagement] Project deleted successfully', { project_id });
+      
+      return {
+        success: true,
+        content: [{
+          type: 'text',
+          text: `**Project Deleted** ✅\n\nProject '${project_id}' and all its data have been removed.`
+        }]
+      };
+    } catch (error) {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to delete project', {
+        project_id,
+        error: error.message
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        content: [{
+          type: 'text',
+          text: `**Delete Failed** ❌\n\nError: ${error.message}`
+        }]
+      };
+    }
+  }
 }

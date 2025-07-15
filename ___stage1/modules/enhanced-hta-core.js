@@ -8,10 +8,14 @@
 import { HTACore } from './hta-core.js';
 import { PureSchemaHTASystem } from './pure-schema-driven-hta.js';
 import { GoalAchievementContext } from './goal-achievement-context.js';
+import { CoreIntelligence } from './core-intelligence.js';
 
 export class EnhancedHTACore extends HTACore {
   constructor(dataPersistence, projectManagement, claudeInterface) {
     super(dataPersistence, projectManagement, claudeInterface);
+    
+    // Initialize Core Intelligence for MCP bridge
+    this.coreIntelligence = new CoreIntelligence(dataPersistence, projectManagement);
     
     // Initialize Pure Schema-Driven Intelligence Engine
     this.schemaEngine = new PureSchemaHTASystem(claudeInterface);
@@ -68,7 +72,7 @@ export class EnhancedHTACore extends HTACore {
         this.dataPersistence,
         this.projectManagement,
         this, // Enhanced HTA Core as htaCore
-        this.claudeInterface,
+        this.coreIntelligence,
         this.vectorStore
       );
       console.error('✅ Gated Onboarding Flow initialized');

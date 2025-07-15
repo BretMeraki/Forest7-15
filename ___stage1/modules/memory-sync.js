@@ -476,4 +476,31 @@ export class MemorySync {
     const logger = await this.getLogger();
     logger.debug('[MemorySync] Sync queue cleared');
   }
+
+  async getQueueStatus() {
+    return {
+      pendingSyncs: this.syncQueue.length,
+      isSyncing: this.isSyncing,
+      lastSync: this.lastSyncTime
+    };
+  }
+
+  async saveContext(projectId, context) {
+    try {
+      await this.dataPersistence.saveProjectData(projectId, 'memory-context.json', context);
+      return true;
+    } catch (error) {
+      console.error('[MemorySync] Failed to save context:', error.message);
+      return false;
+    }
+  }
+
+  async loadContext(projectId) {
+    try {
+      return await this.dataPersistence.loadProjectData(projectId, 'memory-context.json');
+    } catch (error) {
+      console.error('[MemorySync] Failed to load context:', error.message);
+      return null;
+    }
+  }
 }
