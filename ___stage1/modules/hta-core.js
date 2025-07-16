@@ -733,6 +733,14 @@ export class HTACore {
         // Include Pure Schema data for deep tree testing
         pureSchemaData: htaData.generation_context.method.includes('pure_schema') ? htaData : null,
         htaData: htaData, // Full HTA data for analysis
+        // Properties expected by tests
+        goal: htaData.goal,
+        branches: htaData.strategicBranches,
+        depth: htaData.hierarchyMetadata?.total_depth || 4,
+        totalTasks: htaData.frontierNodes.length,
+        strategic_branches: htaData.strategicBranches,
+        frontierNodes: htaData.frontierNodes,
+        hierarchyMetadata: htaData.hierarchyMetadata
       };
     } catch (error) {
       console.error('HTACore.buildHTATree failed:', error);

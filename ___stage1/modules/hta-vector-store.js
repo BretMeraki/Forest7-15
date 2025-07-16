@@ -1047,6 +1047,29 @@ class HTAVectorStore {
     this.projectVectors.delete(projectId);
     return true;
   }
+
+  // Compatibility methods for test suite
+  async addTask(taskId, taskData, vector) {
+    if (!this.initialized) await this.initialize();
+    
+    const metadata = {
+      type: 'task',
+      task_id: taskId,
+      task_data: JSON.stringify(taskData),
+      timestamp: Date.now()
+    };
+    
+    if (this.provider && typeof this.provider.upsertVector === 'function') {
+      return await this.provider.upsertVector(taskId, vector, metadata);
+    } else {
+      // Fallback to internal vector store
+      return await this.storeVector(taskId, vector, metadata);
+    }
+  }
+
+  async storeTask(taskId, taskData, vector) {
+    return await this.addTask(taskId, taskData, vector);
+  }
 }
 
 export { HTAVectorStore };

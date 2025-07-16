@@ -1,25 +1,57 @@
 /**
- * Functional SQLite implementation for production vector storage
- * Provides full functionality for vector operations using in-memory storage
+ * Real SQLite implementation for production vector storage
+ * Provides full database functionality using sqlite3 package
  */
 
-class MockSQLite {
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+let sqlite3;
+let Database;
+
+try {
+  sqlite3 = require('sqlite3').verbose();
+  Database = sqlite3.Database;
+} catch (error) {
+  console.warn('[SQLite] sqlite3 package not available, using in-memory fallback');
+}
+
+class RealSQLite {
   constructor(dbPath, callback) {
     this.dbPath = dbPath;
-    this.tables = new Map();
-    this.isOpen = true;
     
-    // Initialize the vectors table
-    this.tables.set('vectors', new Map());
-    
-    // Simulate async initialization
-    setTimeout(() => {
-      if (callback) callback(null);
-    }, 10);
+    if (Database) {
+      // Use real SQLite database
+      this.db = new Database(dbPath, (err) => {
+        if (err) {
+          console.error('[SQLite] Error opening database:', err);
+          if (callback) callback(err);
+        } else {
+          console.log('[SQLite] Database opened successfully:', dbPath);
+          if (callback) callback(null);
+        }
+      });
+      this.isReal = true;
+    } else {
+      // Fallback to in-memory implementation
+      this.tables = new Map();
+      this.tables.set('vectors', new Map());
+      this.isOpen = true;
+      this.isReal = false;
+      console.log('[SQLite] Using in-memory fallback');
+      
+      setTimeout(() => {
+        if (callback) callback(null);
+      }, 10);
+    }
   }
 
   serialize(callback) {
-    if (callback) callback();
+    if (this.db && this.isReal) {
+      this.db.serialize(callback);
+    } else {
+      if (callback) callback();
+    }
   }
 
   run(sql, params = [], callback) {
@@ -28,6 +60,13 @@ class MockSQLite {
       params = [];
     }
     
+    if (this.db && this.isReal) {
+      // Use real SQLite
+      this.db.run(sql, params, callback);
+      return;
+    }
+    
+    // Fallback implementation
     try {
       // Handle CREATE TABLE
       if (sql.includes('CREATE TABLE')) {
@@ -114,6 +153,13 @@ class MockSQLite {
       params = [];
     }
     
+    if (this.db && this.isReal) {
+      // Use real SQLite
+      this.db.get(sql, params, callback);
+      return;
+    }
+    
+    // Fallback implementation
     try {
       // Handle stats query
       if (sql.includes('COUNT(*) as count')) {
@@ -156,6 +202,13 @@ class MockSQLite {
       params = [];
     }
     
+    if (this.db && this.isReal) {
+      // Use real SQLite
+      this.db.all(sql, params, callback);
+      return;
+    }
+    
+    // Fallback implementation
     try {
       const vectors = this.tables.get('vectors');
       
@@ -203,14 +256,26 @@ class MockSQLite {
   }
 
   close(callback) {
-    this.isOpen = false;
-    setTimeout(() => {
-      if (callback) callback(null);
-    }, 10);
+    if (this.db && this.isReal) {
+      // Use real SQLite close
+      this.db.close(callback);
+    } else {
+      // Fallback implementation
+      this.isOpen = false;
+      setTimeout(() => {
+        if (callback) callback(null);
+      }, 10);
+    }
   }
 
   exec(sql, callback) {
-    // Handle multiple SQL statements separated by semicolons
+    if (this.db && this.isReal) {
+      // Use real SQLite exec
+      this.db.exec(sql, callback);
+      return;
+    }
+    
+    // Fallback implementation
     const statements = sql.split(';').filter(stmt => stmt.trim());
     
     let completed = 0;
@@ -238,9 +303,9 @@ class MockSQLite {
   }
 }
 
-// Mock the sqlite3 module structure
-MockSQLite.Database = MockSQLite;
-MockSQLite.OPEN_READWRITE = 1;
-MockSQLite.OPEN_CREATE = 2;
+// Export the real implementation with fallback
+RealSQLite.Database = RealSQLite;
+RealSQLite.OPEN_READWRITE = 1;
+RealSQLite.OPEN_CREATE = 2;
 
-export default MockSQLite;
+export default RealSQLite;

@@ -132,7 +132,7 @@ export class DataPersistence {
         await this.invalidateProjectCache(projectId);
         
         // Atomic write with validation
-        await this._atomicWriteJSON(filePath, normalizedData);
+        await this._atomicWriteJSON(filePath, normalizedData, transaction);
 
         // Invalidate cache AFTER successful write as well
         await this.cache.delete(cacheKey);
@@ -240,7 +240,7 @@ export class DataPersistence {
         await this.invalidateProjectCache(projectId);
         
         // Atomic write with validation
-        await this._atomicWriteJSON(filePath, normalizedData);
+        await this._atomicWriteJSON(filePath, normalizedData, transaction);
 
         // Invalidate cache AFTER successful write as well
         await this.cache.delete(cacheKey);
@@ -446,8 +446,39 @@ export class DataPersistence {
     }
 
     try {
-      // For simplicity, we'll just clear the transaction
-      // In a full implementation, we'd restore previous states
+      // Restore previous states for all operations in reverse order
+      const operations = [...transaction.operations].reverse();
+      
+      for (const operation of operations) {
+        try {
+          if (operation.type === 'write' && operation.previousState !== undefined) {
+            // Restore previous file state
+            if (operation.previousState === null) {
+              // File didn't exist before, delete it
+              try {
+                await fs.unlink(operation.filePath);
+              } catch (unlinkError) {
+                // File might not exist, which is fine
+                if (unlinkError.code !== 'ENOENT') {
+                  throw unlinkError;
+                }
+              }
+            } else {
+              // Restore previous content
+              await this._atomicWriteJSON(operation.filePath, operation.previousState);
+            }
+          }
+        } catch (restoreError) {
+          await this._log('warn', '[DataPersistence] Failed to restore operation during rollback', {
+            transactionId,
+            operation: operation.type,
+            filePath: operation.filePath,
+            error: restoreError.message,
+          });
+        }
+      }
+
+      // Clear the transaction
       this.transactions.delete(transactionId);
 
       await this._log('debug', '[DataPersistence] Transaction rolled back', {
@@ -459,6 +490,52 @@ export class DataPersistence {
     } catch (error) {
       await this._log('error', '[DataPersistence] Transaction rollback failed', {
         transactionId,
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  // ===== PROJECT DELETION =====
+
+  async deleteProjectData(projectId) {
+    try {
+      // CRITICAL FIX: Validate and extract projectId
+      const validProjectId = this._extractProjectId(projectId, 'deleteProjectData');
+      if (!validProjectId) {
+        throw new Error('projectId must be a non-empty string or object with project_id property');
+      }
+      projectId = validProjectId;
+
+      const projectDir = path.join(this.dataDir, projectId);
+      
+      // Check if project directory exists
+      try {
+        await fs.access(projectDir);
+      } catch (error) {
+        // Project doesn't exist, which is fine
+        await this._log('warn', '[DataPersistence] Project directory not found during deletion', {
+          projectId,
+          projectDir
+        });
+        return true;
+      }
+
+      // Remove entire project directory
+      await fs.rm(projectDir, { recursive: true, force: true });
+
+      // Invalidate all caches for this project
+      await this.invalidateProjectCache(projectId);
+
+      await this._log('debug', '[DataPersistence] Project data deleted', {
+        projectId,
+        projectDir
+      });
+
+      return true;
+    } catch (error) {
+      await this._log('error', '[DataPersistence] Failed to delete project data', {
+        projectId,
         error: error.message,
       });
       throw error;
@@ -666,10 +743,30 @@ export class DataPersistence {
 
   // ===== UTILITY METHODS =====
 
-  async _atomicWriteJSON(filePath, data) {
+  async _atomicWriteJSON(filePath, data, transaction = null) {
     const tempPath = `${filePath}.tmp`;
 
     try {
+      // If transaction provided, record the previous state for rollback
+      if (transaction) {
+        const tx = this.transactions.get(transaction);
+        if (tx) {
+          let previousState = null;
+          try {
+            previousState = await this._readJSON(filePath);
+          } catch (error) {
+            // File doesn't exist, previousState remains null
+          }
+          
+          tx.operations.push({
+            type: 'write',
+            filePath,
+            previousState,
+            timestamp: Date.now()
+          });
+        }
+      }
+
       // Write to temporary file first
       await fs.writeFile(
         tempPath,

@@ -1,0 +1,951 @@
+{
+  "timestamp": "2025-07-15T23:43:18.084Z",
+  "totalFiles": 187,
+  "stubsFound": 166,
+  "files": {
+    "claude-ast-analyzer.js": {
+      "stubs": [
+        {
+          "line": 17,
+          "content": "console.warn('[ClaudeASTAnalyzer] Babel parser not available, using fallback mock parser');"
+        },
+        {
+          "line": 19,
+          "content": "// Fallback mock implementations"
+        },
+        {
+          "line": 22,
+          "content": "console.warn('[ClaudeASTAnalyzer] Mock parser returning empty AST');"
+        },
+        {
+          "line": 32,
+          "content": "console.warn('[ClaudeASTAnalyzer] Mock traverse - no actual traversal performed');"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "config\\file-processing-config.js": {
+      "stubs": [
+        {
+          "line": 111,
+          "content": "/\\.mock\\.js$/,"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "deprecate_modules.js": {
+      "stubs": [
+        {
+          "line": 183,
+          "content": "// Replace with deprecation stub"
+        },
+        {
+          "line": 222,
+          "content": "// Replace with deprecation stub"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "fix-all-issues.js": {
+      "stubs": [
+        {
+          "line": 28,
+          "content": "// Fix 3: Add AST parsing stub capabilities"
+        },
+        {
+          "line": 122,
+          "content": "console.log('\\n📝 Fix 3: Adding AST parsing stub capabilities...');"
+        },
+        {
+          "line": 124,
+          "content": "// Create AST parsing stub module"
+        },
+        {
+          "line": 125,
+          "content": "const astParserPath = path.join(this.basePath, 'modules', 'ast-parser-stub.js');"
+        },
+        {
+          "line": 127,
+          "content": "* AST Parser Stub Module"
+        },
+        {
+          "line": 129,
+          "content": "* This is a stub implementation - can be enhanced with real AST parsing later"
+        },
+        {
+          "line": 138,
+          "content": "* Parse code and extract AST structure (stub implementation)"
+        },
+        {
+          "line": 141,
+          "content": "// Stub implementation - returns a simplified AST-like structure"
+        },
+        {
+          "line": 198,
+          "content": "// Stub pattern analysis"
+        },
+        {
+          "line": 212,
+          "content": "console.log('  ✅ Created AST parser stub module');"
+        },
+        {
+          "line": 223,
+          "content": "import { ASTParser } from './ast-parser-stub.js';`"
+        },
+        {
+          "line": 239,
+          "content": "this.fixes.push('Added AST parsing stub capabilities');"
+        },
+        {
+          "line": 298,
+          "content": "// Stub implementation - would use real vector analysis"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "local-mcp-types.js": {
+      "stubs": [
+        {
+          "line": 6,
+          "content": "// Mock schema objects that match MCP SDK structure"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\ambiguous-desires\\test-dialogue-persistence.js": {
+      "stubs": [
+        {
+          "line": 11,
+          "content": "// Mock dependencies for testing"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "modules\\context-inference-engine.js": {
+      "stubs": [
+        {
+          "line": 626,
+          "content": "// Additional stub methods for comprehensive behavioral analysis"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\context-utils.js": {
+      "stubs": [
+        {
+          "line": 4,
+          "content": "* Phase-1 implementation replaces previous stub functions so that:"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\core-intelligence.js": {
+      "stubs": [
+        {
+          "line": 419,
+          "content": "// Stub implementation of AST parser"
+        },
+        {
+          "line": 428,
+          "content": "// Stub for finding similar tasks"
+        },
+        {
+          "line": 433,
+          "content": "// Stub for vector database integration"
+        },
+        {
+          "line": 438,
+          "content": "// Stub for testing vector capabilities"
+        },
+        {
+          "line": 460,
+          "content": "// Stub methods for compatibility - delegate to analysis methods when needed"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\enhanced-tree-evolution.js": {
+      "stubs": [
+        {
+          "line": 20,
+          "content": "// Mock the missing imports until they're available"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\goal-achievement-context.js": {
+      "stubs": [
+        {
+          "line": 532,
+          "content": "// Additional stub methods"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\hta-bridge-communication.js": {
+      "stubs": [
+        {
+          "line": 6,
+          "content": "import MockWebSocket from './mock-websocket.js';"
+        },
+        {
+          "line": 8,
+          "content": "// Use mock WebSocket to avoid dependency issues"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\hta-core.js": {
+      "stubs": [
+        {
+          "line": 550,
+          "content": "// Format 2: Single object with tasks array (mock response format)"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\intelligent-onboarding-system.js": {
+      "stubs": [
+        {
+          "line": 820,
+          "content": "* Perform goal analysis (stub implementation for now)"
+        },
+        {
+          "line": 833,
+          "content": "* Generate adaptive schema (stub implementation for now)"
+        },
+        {
+          "line": 844,
+          "content": "* Generate contextual questions (stub implementation for now)"
+        },
+        {
+          "line": 851,
+          "content": "* Optimize question flow (stub implementation for now)"
+        },
+        {
+          "line": 861,
+          "content": "* Initialize conversation context (stub implementation for now)"
+        },
+        {
+          "line": 874,
+          "content": "* Extract conversation insights (stub implementation for now)"
+        },
+        {
+          "line": 885,
+          "content": "* Assess readiness for generation (stub implementation for now)"
+        },
+        {
+          "line": 897,
+          "content": "* Analyze response patterns (stub implementation for now)"
+        },
+        {
+          "line": 908,
+          "content": "* Synthesize user profile (stub implementation for now)"
+        },
+        {
+          "line": 922,
+          "content": "* Enhance goal context (stub implementation for now)"
+        },
+        {
+          "line": 936,
+          "content": "* Generate schema optimizations (stub implementation for now)"
+        },
+        {
+          "line": 948,
+          "content": "* Assess context readiness (stub implementation for now)"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\mcp-intelligence-bridge.js": {
+      "stubs": [
+        {
+          "line": 5,
+          "content": "* This replaces mock responses with real Claude intelligence"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\mock-sqlite.js": {
+      "stubs": [
+        {
+          "line": 241,
+          "content": "// Mock the sqlite3 module structure"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\mock-websocket.js": {
+      "stubs": [
+        {
+          "line": 2,
+          "content": "* Mock WebSocket implementation for environments without ws package"
+        },
+        {
+          "line": 20,
+          "content": "this.emit('error', new Error('Mock WebSocket: External HTA server not available'));"
+        },
+        {
+          "line": 44,
+          "content": "// Mock send - does nothing since no real connection"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\real-llm-interface.js": {
+      "stubs": [
+        {
+          "line": 3,
+          "content": "* Replaces the mock MCP bridge with real LLM communication"
+        },
+        {
+          "line": 18,
+          "content": "* Generate embedding vector for text (mock implementation)"
+        },
+        {
+          "line": 249,
+          "content": "* CRITICAL: This should ONLY forward to Claude, never generate mock responses"
+        },
+        {
+          "line": 258,
+          "content": "// Never generate mock responses here"
+        },
+        {
+          "line": 572,
+          "content": "* Generate intelligent mock responses that appear to be real LLM output"
+        },
+        {
+          "line": 576,
+          "content": "console.error('🎭 Generating intelligent mock response for goal-based learning...');"
+        },
+        {
+          "line": 1184,
+          "content": "// If response looks like it came from Claude (not a mock), use it directly"
+        },
+        {
+          "line": 1199,
+          "content": "// Otherwise, treat as a mock that needs enhancement"
+        },
+        {
+          "line": 1214,
+          "content": "* Check if response appears to be a generic mock"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\rich-context-engine.js": {
+      "stubs": [
+        {
+          "line": 599,
+          "content": "// Additional stub methods for comprehensive context analysis"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\task-selection-engine.js": {
+      "stubs": [
+        {
+          "line": 11,
+          "content": "import { ASTParserStub } from './ast-parser-stub.js';"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\task-strategy-core.js": {
+      "stubs": [
+        {
+          "line": 40,
+          "content": "// Initialize web context (stub for now)"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\vector-providers\\SQLiteVecProvider.js": {
+      "stubs": [
+        {
+          "line": 15,
+          "content": "// Fallback to mock implementation for environments without sqlite3"
+        },
+        {
+          "line": 16,
+          "content": "const MockSQLite = await import('../mock-sqlite.js');"
+        },
+        {
+          "line": 18,
+          "content": "console.warn('[SQLiteVecProvider] Using mock SQLite implementation - install sqlite3 for production use');"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "modules\\__tests__\\core-intelligence.test.js": {
+      "stubs": [
+        {
+          "line": 6,
+          "content": "// Mock a sample response for testing"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "modules\\__tests__\\gated-onboarding-flow.test.js": {
+      "stubs": [
+        {
+          "line": 38,
+          "content": "// Create comprehensive mock system"
+        },
+        {
+          "line": 39,
+          "content": "const createMockFunction = (defaultReturnValue) => {"
+        },
+        {
+          "line": 65,
+          "content": "// Mock data persistence with comprehensive functionality"
+        },
+        {
+          "line": 67,
+          "content": "loadProjectData: createMockFunction(Promise.resolve(mockProject)),"
+        },
+        {
+          "line": 68,
+          "content": "saveProjectData: createMockFunction(Promise.resolve(true)),"
+        },
+        {
+          "line": 69,
+          "content": "loadPathData: createMockFunction(Promise.resolve({"
+        },
+        {
+          "line": 75,
+          "content": "savePathData: createMockFunction(Promise.resolve(true)),"
+        },
+        {
+          "line": 76,
+          "content": "createProject: createMockFunction(Promise.resolve(mockProject)),"
+        },
+        {
+          "line": 77,
+          "content": "listProjects: createMockFunction(Promise.resolve([mockProject]))"
+        },
+        {
+          "line": 80,
+          "content": "// Mock project management"
+        },
+        {
+          "line": 82,
+          "content": "getActiveProject: createMockFunction(Promise.resolve(mockProject)),"
+        },
+        {
+          "line": 83,
+          "content": "createProject: createMockFunction(Promise.resolve(mockProject)),"
+        },
+        {
+          "line": 84,
+          "content": "switchToProject: createMockFunction(Promise.resolve(true)),"
+        },
+        {
+          "line": 85,
+          "content": "listProjects: createMockFunction(Promise.resolve([mockProject]))"
+        },
+        {
+          "line": 88,
+          "content": "// Mock LLM interface with realistic responses"
+        },
+        {
+          "line": 90,
+          "content": "chat: createMockFunction(Promise.resolve({"
+        },
+        {
+          "line": 91,
+          "content": "text: 'Mock LLM response for goal validation and analysis'"
+        },
+        {
+          "line": 93,
+          "content": "generateText: createMockFunction(Promise.resolve('Mock generated content')),"
+        },
+        {
+          "line": 93,
+          "content": "generateText: createMockFunction(Promise.resolve('Mock generated content')),"
+        },
+        {
+          "line": 94,
+          "content": "analyzeGoal: createMockFunction(Promise.resolve({"
+        },
+        {
+          "line": 100,
+          "content": "generateQuestionnaire: createMockFunction(Promise.resolve({"
+        },
+        {
+          "line": 106,
+          "content": "analyzeComplexity: createMockFunction(Promise.resolve({"
+        },
+        {
+          "line": 113,
+          "content": "// Mock event bus"
+        },
+        {
+          "line": 115,
+          "content": "emit: createMockFunction(),"
+        },
+        {
+          "line": 116,
+          "content": "on: createMockFunction(),"
+        },
+        {
+          "line": 117,
+          "content": "off: createMockFunction()"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "modules\\__tests__\\task-generator.test.js": {
+      "stubs": [
+        {
+          "line": 71,
+          "content": "const createMockFunction = (defaultReturnValue) => {"
+        },
+        {
+          "line": 97,
+          "content": "// Mock data persistence"
+        },
+        {
+          "line": 99,
+          "content": "loadProjectData: createMockFunction(Promise.resolve(mockConfig)),"
+        },
+        {
+          "line": 100,
+          "content": "saveProjectData: createMockFunction(Promise.resolve(true)),"
+        },
+        {
+          "line": 101,
+          "content": "loadPathData: createMockFunction(Promise.resolve(mockHtaData)),"
+        },
+        {
+          "line": 102,
+          "content": "savePathData: createMockFunction(Promise.resolve(true))"
+        },
+        {
+          "line": 105,
+          "content": "// Mock project management"
+        },
+        {
+          "line": 107,
+          "content": "getActiveProject: createMockFunction(Promise.resolve(mockProject))"
+        },
+        {
+          "line": 110,
+          "content": "// Mock LLM interface"
+        },
+        {
+          "line": 112,
+          "content": "chat: createMockFunction(Promise.resolve({ text: 'Mock response' })),"
+        },
+        {
+          "line": 112,
+          "content": "chat: createMockFunction(Promise.resolve({ text: 'Mock response' })),"
+        },
+        {
+          "line": 113,
+          "content": "generateText: createMockFunction(Promise.resolve('Mock text'))"
+        },
+        {
+          "line": 113,
+          "content": "generateText: createMockFunction(Promise.resolve('Mock text'))"
+        },
+        {
+          "line": 116,
+          "content": "// Mock event bus"
+        },
+        {
+          "line": 118,
+          "content": "emit: createMockFunction(),"
+        },
+        {
+          "line": 119,
+          "content": "on: createMockFunction()"
+        },
+        {
+          "line": 745,
+          "content": "// Mock validation to fail"
+        },
+        {
+          "line": 946,
+          "content": "// Reset mock calls to track properly"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "remove-stubs-and-mocks.js": {
+      "stubs": [
+        {
+          "line": 17,
+          "content": "/jest\\.mock/,"
+        },
+        {
+          "line": 22,
+          "content": "/createMock/,"
+        },
+        {
+          "line": 23,
+          "content": "/createStub/"
+        },
+        {
+          "line": 97,
+          "content": "this.stubsFound.forEach(stub => {"
+        },
+        {
+          "line": 98,
+          "content": "if (!byFile[stub.file]) {"
+        },
+        {
+          "line": 99,
+          "content": "byFile[stub.file] = [];"
+        },
+        {
+          "line": 101,
+          "content": "byFile[stub.file].push(stub);"
+        },
+        {
+          "line": 107,
+          "content": "stubs.forEach(stub => {"
+        },
+        {
+          "line": 108,
+          "content": "console.log(`   Line ${stub.line}: ${stub.content}`);"
+        },
+        {
+          "line": 112,
+          "content": "// Analyze stub types"
+        },
+        {
+          "line": 118,
+          "content": "console.log('\\n📊 Stub Analysis:');"
+        },
+        {
+          "line": 125,
+          "content": "this.stubsFound.forEach(stub => {"
+        },
+        {
+          "line": 126,
+          "content": "const isTest = stub.file.includes('test') || stub.file.includes('spec');"
+        },
+        {
+          "line": 127,
+          "content": "const isMock = /mock/i.test(stub.content);"
+        },
+        {
+          "line": 127,
+          "content": "const isMock = /mock/i.test(stub.content);"
+        },
+        {
+          "line": 128,
+          "content": "const isStub = /stub/i.test(stub.content);"
+        },
+        {
+          "line": 130,
+          "content": "if (isMock) mockFiles.add(stub.file);"
+        },
+        {
+          "line": 131,
+          "content": "if (isStub) stubFiles.add(stub.file);"
+        },
+        {
+          "line": 134,
+          "content": "testStubs.push(stub);"
+        },
+        {
+          "line": 136,
+          "content": "implementationStubs.push(stub);"
+        },
+        {
+          "line": 147,
+          "content": "implementationStubs.forEach(stub => {"
+        },
+        {
+          "line": 148,
+          "content": "console.log(`   ${stub.file}:${stub.line}`);"
+        },
+        {
+          "line": 162,
+          "content": "this.stubsFound.forEach(stub => {"
+        },
+        {
+          "line": 163,
+          "content": "if (!report.files[stub.file]) {"
+        },
+        {
+          "line": 164,
+          "content": "report.files[stub.file] = {"
+        },
+        {
+          "line": 169,
+          "content": "report.files[stub.file].stubs.push({"
+        },
+        {
+          "line": 170,
+          "content": "line: stub.line,"
+        },
+        {
+          "line": 171,
+          "content": "content: stub.content"
+        },
+        {
+          "line": 183,
+          "content": "recommendations.push('CRITICAL: Remove stub from implementation file');"
+        },
+        {
+          "line": 190,
+          "content": "await fs.writeFile('stub-cleanup-report.json', JSON.stringify(report, null, 2));"
+        },
+        {
+          "line": 191,
+          "content": "console.log('\\n📝 Cleanup report saved to stub-cleanup-report.json');"
+        },
+        {
+          "line": 195,
+          "content": "// Run the stub remover"
+        },
+        {
+          "line": 198,
+          "content": "console.log('🧹 Stub and Mock Detection Tool\\n');"
+        },
+        {
+          "line": 198,
+          "content": "console.log('🧹 Stub and Mock Detection Tool\\n');"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "ruthless-verification-test.js": {
+      "stubs": [
+        {
+          "line": 49,
+          "content": "// Setup fake onboarding to bypass gating"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "simple-stage-fix-test.js": {
+      "stubs": [
+        {
+          "line": 11,
+          "content": "// Create a mock data persistence layer"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "simulate_onboarding.js": {
+      "stubs": [
+        {
+          "line": 6,
+          "content": "// Mock logger to avoid actual console output during simulation"
+        },
+        {
+          "line": 14,
+          "content": "// Mock HTACore for controlled simulation"
+        },
+        {
+          "line": 36,
+          "content": "source: 'mock'"
+        },
+        {
+          "line": 56,
+          "content": "Object.assign(htaCore, mockHTACore); // Override with mock methods"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "test-real-intelligence.js": {
+      "stubs": [
+        {
+          "line": 85,
+          "content": "// Check if branches are generic (indicating mock responses)"
+        },
+        {
+          "line": 95,
+          "content": "console.error('This suggests mock responses are still being used.');"
+        },
+        {
+          "line": 106,
+          "content": "// Test 4: Check for mock response patterns"
+        },
+        {
+          "line": 107,
+          "content": "console.log('\\nTest 4: Checking for mock response patterns...');"
+        },
+        {
+          "line": 112,
+          "content": "goal: 'Test for mock patterns',"
+        },
+        {
+          "line": 123,
+          "content": "console.log('Mock test response:', JSON.stringify(mockTestResponse, null, 2));"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "test-suite-complete.js": {
+      "stubs": [
+        {
+          "line": 122,
+          "content": "// Mock test since gated onboarding needs proper initialization"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "ultimate-forest-integration-test.js": {
+      "stubs": [
+        {
+          "line": 480,
+          "content": "// Mock implementation - in real test would capture output"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "utils\\mock-babel-parser.js": {
+      "stubs": [
+        {
+          "line": 2,
+          "content": "* Mock Babel Parser for environments without @babel/parser package"
+        },
+        {
+          "line": 19,
+          "content": "// Mock traverse function"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    },
+    "utils\\__tests__\\hta-guard.test.js": {
+      "stubs": [
+        {
+          "line": 8,
+          "content": "// Mock dependencies"
+        },
+        {
+          "line": 310,
+          "content": "expect(mockMutation.mock.instances[0]).toBe(context);"
+        },
+        {
+          "line": 340,
+          "content": "// Mock console.warn to avoid noise in tests"
+        }
+      ],
+      "recommendations": [
+        "Replace test mocks with real component instances",
+        "Use actual implementations instead of stubs"
+      ]
+    },
+    "validate-diagnostic-implementation.js": {
+      "stubs": [
+        {
+          "line": 45,
+          "content": "filePath: '___stage1/modules/fake-file.js',"
+        },
+        {
+          "line": 46,
+          "content": "description: 'Fake function missing'"
+        }
+      ],
+      "recommendations": [
+        "CRITICAL: Remove stub from implementation file",
+        "Implement real functionality"
+      ]
+    }
+  }
+}
