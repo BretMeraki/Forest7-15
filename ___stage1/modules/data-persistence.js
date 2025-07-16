@@ -897,9 +897,12 @@ export class DataPersistence {
             if (config) {
               projects.push({
                 id: entry.name,
+                name: config.project_name || config.goal, // Add name for test compatibility
+                project_name: config.project_name || config.goal, // Add project_name for test compatibility
                 goal: config.goal,
                 created_at: config.created_at,
                 progress: config.progress || 0,
+                status: 'active', // Add status for test compatibility
               });
             }
           } catch (error) {

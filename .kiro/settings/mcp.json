@@ -42,6 +42,16 @@
       "autoApprove": [
         "sequentialthinking"
       ]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena.git",
+        "serena-mcp-server.exe"
+      ],
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }

@@ -97,6 +97,7 @@ export class ProjectManagement {
 
       const projectConfig = {
         id: project_id,
+        project_name: project_id, // Add project_name for test compatibility
         goal,
         specific_interests,
         learning_paths:
@@ -166,6 +167,7 @@ export class ProjectManagement {
 
         return {
           success: true,
+          message: `Project ${project_id} created successfully with goal: ${goal}`,
           content: [
             {
               type: 'text',
@@ -179,6 +181,7 @@ export class ProjectManagement {
                 `Your project is now active and ready for HTA tree building. Use \`build_hta_tree_forest\` to create your strategic learning framework!`,
             },
           ],
+          projectId: project_id,
           project_id,
           knowledge_level: knowledgeLevel,
           skill_mappings: skillMappings,
@@ -214,7 +217,8 @@ export class ProjectManagement {
 
   async switchProject(project_id) {
     try {
-      this.logger.info('[ProjectManagement] Switching to project', { project_id });
+      const logger = await this.getLogger();
+      logger.info('[ProjectManagement] Switching to project', { project_id });
 
       // Check if project exists
       if (!(await this.dataPersistence.projectExists(project_id))) {
@@ -247,9 +251,10 @@ export class ProjectManagement {
       // Set as active project
       this.activeProjectId = project_id;
 
-      this.logger.info('[ProjectManagement] Project switched successfully', { project_id });
+      logger.info('[ProjectManagement] Project switched successfully', { project_id });
 
       return {
+        success: true,
         content: [
           {
             type: 'text',
@@ -262,15 +267,19 @@ export class ProjectManagement {
           },
         ],
         project_id,
+        currentProject: project_id,
+        current_project: project_id,
         project_config: config,
       };
     } catch (error) {
-      this.logger.error('[ProjectManagement] Project switch failed', {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Project switch failed', {
         project_id,
         error: error.message,
       });
 
       return {
+        success: false,
         content: [
           {
             type: 'text',
@@ -636,6 +645,125 @@ export class ProjectManagement {
 
   getActiveProjectId() {
     return this.activeProjectId;
+  }
+
+  async updateProject(projectId, updates) {
+    try {
+      const logger = await this.getLogger();
+      logger.info('[ProjectManagement] Updating project', { projectId, updates });
+
+      // Validate project exists
+      const validation = await this.validateProject(projectId);
+      if (!validation.valid) {
+        throw new Error(validation.error);
+      }
+
+      // Load current config
+      const currentConfig = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
+      if (!currentConfig) {
+        throw new Error('Project configuration not found');
+      }
+
+      // Merge updates
+      const updatedConfig = {
+        ...currentConfig,
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
+      // Save updated config
+      await this.dataPersistence.saveProjectData(projectId, FILE_NAMES.CONFIG, updatedConfig);
+
+      logger.info('[ProjectManagement] Project updated successfully', { projectId });
+
+      return {
+        success: true,
+        content: [
+          {
+            type: 'text',
+            text: `**Project Updated** ✅\n\nProject '${projectId}' has been updated successfully.`,
+          },
+        ],
+        project_id: projectId,
+        updated_config: updatedConfig,
+      };
+    } catch (error) {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to update project', {
+        projectId,
+        error: error.message,
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        content: [
+          {
+            type: 'text',
+            text: `**Update Failed** ❌\n\nError: ${error.message}`,
+          },
+        ],
+      };
+    }
+  }
+
+  async getProject(projectId) {
+    try {
+      const logger = await this.getLogger();
+      logger.debug('[ProjectManagement] Getting project', { projectId });
+
+      // Validate project exists
+      const validation = await this.validateProject(projectId);
+      if (!validation.valid) {
+        throw new Error(validation.error);
+      }
+
+      // Load project config
+      const config = await this.dataPersistence.loadProjectData(projectId, FILE_NAMES.CONFIG);
+      if (!config) {
+        throw new Error('Project configuration not found');
+      }
+
+      return {
+        success: true,
+        project: config,
+        project_id: projectId,
+      };
+    } catch (error) {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to get project', {
+        projectId,
+        error: error.message,
+      });
+
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  async getCurrentProject() {
+    try {
+      if (this.activeProjectId) {
+        const config = await this.dataPersistence.loadProjectData(this.activeProjectId, FILE_NAMES.CONFIG);
+        return config ? { id: this.activeProjectId, ...config } : this.activeProjectId;
+      }
+      
+      // Check global config for active project
+      const globalData = await this.dataPersistence.loadGlobalData(FILE_NAMES.CONFIG);
+      if (globalData?.activeProject) {
+        this.activeProjectId = globalData.activeProject;
+        const config = await this.dataPersistence.loadProjectData(this.activeProjectId, FILE_NAMES.CONFIG);
+        return config ? { id: this.activeProjectId, ...config } : this.activeProjectId;
+      }
+      
+      return null;
+    } catch (error) {
+      const logger = await this.getLogger();
+      logger.error('[ProjectManagement] Failed to get current project', { error: error.message });
+      return null;
+    }
   }
 
   async validateProject(projectId) {
