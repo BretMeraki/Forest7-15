@@ -103,8 +103,11 @@ Each branch should make someone think "I know exactly what capability I'm buildi
     this.initializeContextTracking(goal, goalContext);
 
     // Progressive depth generation based on complexity and user needs
+    const targetDepth = enhancedContext.progressiveDepth || 6; // Default to full depth
     const result = {
       goal,
+      level: 0, // Root level for the tree
+      depth: targetDepth, // Total depth of the tree
       level1_goalContext: goalContext,
       level2_strategicBranches: strategicBranches,
       userContext: this.getContextSnapshot(),
@@ -119,8 +122,6 @@ Each branch should make someone think "I know exactly what capability I'm buildi
       ...enhancedContext,
       goal: goal
     };
-    
-    const targetDepth = enhancedContext.progressiveDepth || 6; // Default to full depth
     
     // PERFORMANCE OPTIMIZED: Generate all levels with intelligent sequencing
     // Level 3 must complete before level 4, but can prepare data in parallel
@@ -700,6 +701,7 @@ Generate primitives that:
               name: `${goal} - Foundation Phase`,
               description: `Build foundational knowledge for ${goal}`,
               priority: 1,
+              complexity: 3,
               rationale: 'Essential groundwork',
               domain_focus: 'fundamental'
             },
@@ -707,6 +709,7 @@ Generate primitives that:
               name: `${goal} - Development Phase`,
               description: `Develop practical skills for ${goal}`,
               priority: 2,
+              complexity: 5,
               rationale: 'Skill building',
               domain_focus: 'practical'
             },
@@ -714,6 +717,7 @@ Generate primitives that:
               name: `${goal} - Mastery Phase`,
               description: `Achieve proficiency in ${goal}`,
               priority: 3,
+              complexity: 7,
               rationale: 'Advanced capability',
               domain_focus: 'mastery'
             }
@@ -1092,6 +1096,7 @@ Generate intelligent, goal-specific content that directly addresses the user's o
               name: { type: "string" },
               description: { type: "string" },
               priority: { type: "integer", minimum: 1 },
+              complexity: { type: "number", minimum: 1, maximum: 10 },
               rationale: { type: "string" },
               domain_focus: { type: "string" },
               expected_outcomes: { type: "array", items: { type: "string" } },
@@ -1099,7 +1104,7 @@ Generate intelligent, goal-specific content that directly addresses the user's o
               pain_point_mitigations: { type: "array", items: { type: "string" } },
               exploration_opportunities: { type: "array", items: { type: "string" } }
             },
-            required: ["name", "description", "priority", "rationale", "domain_focus"]
+            required: ["name", "description", "priority", "complexity", "rationale", "domain_focus"]
           }
         },
         progression_logic: { type: "string" },
@@ -1438,6 +1443,7 @@ Generate intelligent, goal-specific content that directly addresses the user's o
             name: 'Fundamentals',
             description: 'Build foundational knowledge and understanding',
             priority: 1,
+            complexity: 3,
             rationale: 'Essential groundwork for successful learning',
             domain_focus: 'theoretical',
             expected_outcomes: ['Core understanding', 'Strong foundation'],
@@ -1449,6 +1455,7 @@ Generate intelligent, goal-specific content that directly addresses the user's o
             name: 'Application',
             description: 'Apply concepts in practical scenarios',
             priority: 2,
+            complexity: 5,
             rationale: 'Practice reinforces learning',
             domain_focus: 'hands-on',
             expected_outcomes: ['Practical skills', 'Real-world experience'],
@@ -1460,6 +1467,7 @@ Generate intelligent, goal-specific content that directly addresses the user's o
             name: 'Mastery',
             description: 'Achieve proficiency and expertise',
             priority: 3,
+            complexity: 7,
             rationale: 'Deepen understanding and capabilities',
             domain_focus: 'mixed',
             expected_outcomes: ['Expert-level skills', 'Independent capability'],

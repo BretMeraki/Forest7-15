@@ -24,7 +24,7 @@ export class AdaptiveBranchGenerator {
       // === TECHNICAL DOMAINS ===
       'technical': {
         archetypePattern: ['Fundamentals', 'Practical Application', 'System Building', 'Optimization', 'Advanced Integration'],
-        signals: ['programming', 'code', 'software', 'algorithm', 'technical', 'engineering', 'development', 'system'],
+        signals: ['programming', 'code', 'software', 'algorithm', 'technical', 'engineering', 'development', 'system', 'app', 'application', 'react', 'native', 'javascript', 'framework', 'library', 'api', 'database', 'web', 'mobile'],
         branchCharacteristics: {
           logic_driven: true,
           progressive_complexity: true,
@@ -232,7 +232,9 @@ export class AdaptiveBranchGenerator {
         intent: intentPattern.name,
         characteristics: this.generateBranchCharacteristics(branchName, domainArchetype, intentPattern),
         focus: this.determineBranchFocus(branchName, domainArchetype, learningStyle),
-        tasks: []
+        complexity: this.calculateBranchComplexity(branchName, complexityAnalysis, index),
+        tasks: [],
+        subtasks: [] // Add subtasks for test compatibility
       });
     });
     
@@ -304,6 +306,34 @@ export class AdaptiveBranchGenerator {
     }
     
     return characteristics;
+  }
+
+  /**
+   * Calculate complexity for a specific branch
+   */
+  calculateBranchComplexity(branchName, complexityAnalysis, index) {
+    const baseComplexity = complexityAnalysis.score || 5;
+    const branchLower = branchName.toLowerCase();
+    
+    // Adjust complexity based on branch characteristics
+    let complexity = baseComplexity;
+    
+    // Foundation branches are typically easier
+    if (branchLower.includes('foundation') || branchLower.includes('fundamental') || index === 0) {
+      complexity = Math.max(1, complexity - 2);
+    }
+    
+    // Advanced/mastery branches are harder
+    if (branchLower.includes('advanced') || branchLower.includes('mastery') || branchLower.includes('optimization')) {
+      complexity = Math.min(10, complexity + 2);
+    }
+    
+    // Application/practice branches are moderate
+    if (branchLower.includes('application') || branchLower.includes('practice')) {
+      complexity = Math.max(2, Math.min(8, complexity));
+    }
+    
+    return Math.round(complexity);
   }
 
   /**

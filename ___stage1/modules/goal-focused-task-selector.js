@@ -16,13 +16,25 @@ export class GoalFocusedTaskSelector {
 
   async selectGoalFocusedTaskBatch(projectId, htaData, goalContext, config) {
     try {
+      // Handle null goalContext
+      if (!goalContext) {
+        console.log('[GoalFocusedTaskSelector] No goal context available, creating default context');
+        goalContext = {
+          recommendations: [],
+          alignment: { goal_advancement_potential: 'medium' },
+          momentum: { velocity: { current: 'steady' } },
+          readiness: { immediate_potential: { can_advance_goal: true } },
+          breakthrough: { breakthrough_window: { conditions_aligned: false } }
+        };
+      }
+      
       // Use goal achievement context to select optimal task batch
-      const recommendations = goalContext.recommendations;
-      const alignment = goalContext.alignment;
+      const recommendations = goalContext.recommendations || [];
+      const alignment = goalContext.alignment || { goal_advancement_potential: 'medium' };
       
       // Build goal-focused query based on context
       const goalFocusedQuery = this.buildGoalFocusedQuery(goalContext, config);
-      console.error('[GoalFocusedTaskSelector] Goal-focused query:', goalFocusedQuery.substr(0, 100) + '...');
+      console.error('[GoalFocusedTaskSelector] Goal-focused query:', goalFocusedQuery.substring(0, 100) + '...');
       
       // Get batch of goal-focused tasks (5-7 tasks, optimal learning batch)
       const taskBatch = await this.vectorStore.findGoalFocusedTaskBatch(
@@ -74,7 +86,9 @@ export class GoalFocusedTaskSelector {
     const parts = [];
     
     // Add goal information
-    parts.push(`goal:${config.goal}`);
+    if (config?.goal) {
+      parts.push(`goal:${config.goal}`);
+    }
     
     // Add context from goal achievement analysis
     const alignment = goalContext.alignment;

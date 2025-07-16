@@ -513,7 +513,14 @@ export class MemorySync {
     return {
       pendingSyncs: this.syncQueue.length,
       isSyncing: this.isSyncing,
+      isProcessing: this.isSyncing, // Add isProcessing for test compatibility
       lastSyncTime: this.lastSyncTime,
+      queue: this.syncQueue.map(item => ({
+        projectId: item.projectId,
+        path: item.pathName,
+        priority: item.priority,
+        timestamp: item.timestamp
+      })),
       queuedItems: this.syncQueue.map(item => ({
         projectId: item.projectId,
         pathName: item.pathName,

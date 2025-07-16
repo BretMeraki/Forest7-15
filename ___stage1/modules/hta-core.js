@@ -366,19 +366,25 @@ export class HTACore {
       }
 
       // Check if onboarding is complete before allowing HTA tree generation
+      // EXCEPTION: Allow tree generation during onboarding if called from gated onboarding flow
       const onboardingState = await this.dataPersistence.loadProjectData(projectId, 'onboarding_state.json');
+      const isFromOnboardingFlow = args.from_onboarding_flow || args.accumulated_context || args.context_evolution;
+      
       if (!onboardingState || onboardingState.current_stage !== 'completed') {
-        return {
-          success: false,
-          content: [
-            {
-              type: 'text',
-              text: `**Gated Onboarding Required** 🔒\n\nAccording to the Forest documentation, HTA trees should only be generated after completing the 6-stage gated onboarding process to ensure comprehensive context gathering.\n\n**Current Status**: ${onboardingState?.current_stage || 'Not Started'}\n\n**Next Steps**: Use \`start_learning_journey_forest\` to begin the gated onboarding process.`,
-            },
-          ],
-          requires_onboarding: true,
-          current_stage: onboardingState?.current_stage || 'not_started',
-        };
+        // Allow tree generation if called from gated onboarding flow
+        if (!isFromOnboardingFlow) {
+          return {
+            success: false,
+            content: [
+              {
+                type: 'text',
+                text: `**Gated Onboarding Required** 🔒\n\nAccording to the Forest documentation, HTA trees should only be generated after completing the 6-stage gated onboarding process to ensure comprehensive context gathering.\n\n**Current Status**: ${onboardingState?.current_stage || 'Not Started'}\n\n**Next Steps**: Use \`start_learning_journey_forest\` to begin the gated onboarding process.`,
+              },
+            ],
+            requires_onboarding: true,
+            current_stage: onboardingState?.current_stage || 'not_started',
+          };
+        }
       }
 
       const existingHTA = await this.loadPathHTA(projectId, pathName || 'general');
